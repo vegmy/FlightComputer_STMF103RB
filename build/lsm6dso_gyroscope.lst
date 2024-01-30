@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccYeikjX.s 			page 1
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -18,11 +18,596 @@ ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccYeikjX.s 			page 1
   15              	.Ltext0:
   16              		.cfi_sections	.debug_frame
   17              		.file 1 "Core/Src/lsm6dso_gyroscope.c"
-  18              	.Letext0:
-ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccYeikjX.s 			page 2
+  18              		.section	.text.lsm6dso_read_acc_axis,"ax",%progbits
+  19              		.align	1
+  20              		.global	lsm6dso_read_acc_axis
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	lsm6dso_read_acc_axis:
+  26              	.LVL0:
+  27              	.LFB67:
+   1:Core/Src/lsm6dso_gyroscope.c **** #include "main.h"
+   2:Core/Src/lsm6dso_gyroscope.c **** #include "lsm6dso_gyroscope.h"
+   3:Core/Src/lsm6dso_gyroscope.c **** 
+   4:Core/Src/lsm6dso_gyroscope.c **** /* LSM6DSO Registers */
+   5:Core/Src/lsm6dso_gyroscope.c **** const uint8_t LSM6DSO_ADD_REG = 0xD6;
+   6:Core/Src/lsm6dso_gyroscope.c **** 
+   7:Core/Src/lsm6dso_gyroscope.c **** /* LSM6DSO acceleration registers */
+   8:Core/Src/lsm6dso_gyroscope.c **** const uint8_t LSM6DSO_OUTX_L_A = 0x28;
+   9:Core/Src/lsm6dso_gyroscope.c **** const uint8_t LSM6DSO_OUTX_H_A = 0x29;
+  10:Core/Src/lsm6dso_gyroscope.c **** 
+  11:Core/Src/lsm6dso_gyroscope.c **** /* LSM6DSO control registers */
+  12:Core/Src/lsm6dso_gyroscope.c **** const uint8_t LSM6DSO_CTRL1_XL = 0x10;
+  13:Core/Src/lsm6dso_gyroscope.c **** const uint8_t LSM6DSO_CTRL6_C = 0x15;
+  14:Core/Src/lsm6dso_gyroscope.c **** 
+  15:Core/Src/lsm6dso_gyroscope.c **** /* LSM6DSO data */
+  16:Core/Src/lsm6dso_gyroscope.c **** const uint8_t LSM6DSO_CTRL1XL_DATA = 0x44;
+  17:Core/Src/lsm6dso_gyroscope.c **** const float LSM6DSO_ACC_SENSITIVITY = 0.122f;
+  18:Core/Src/lsm6dso_gyroscope.c **** 
+  19:Core/Src/lsm6dso_gyroscope.c **** /* Calibration data */
+  20:Core/Src/lsm6dso_gyroscope.c **** float accX_offset = 0.0f;
+  21:Core/Src/lsm6dso_gyroscope.c **** float accY_offset = 0.0f;
+  22:Core/Src/lsm6dso_gyroscope.c **** float accZ_offset = 0.0f;
+  23:Core/Src/lsm6dso_gyroscope.c **** 
+  24:Core/Src/lsm6dso_gyroscope.c **** 
+  25:Core/Src/lsm6dso_gyroscope.c **** HAL_StatusTypeDef lsm6dso_init(I2C_HandleTypeDef *ptr_i2c1)
+  26:Core/Src/lsm6dso_gyroscope.c **** {
+  27:Core/Src/lsm6dso_gyroscope.c ****     /* Set accelerometer to 2g full scale range and 104 Hz output data rate */
+  28:Core/Src/lsm6dso_gyroscope.c ****     HAL_StatusTypeDef write_mem_ok = HAL_I2C_Mem_Write(ptr_i2c1, LSM6DSO_ADD_REG, LSM6DSO_CTRL1_XL,
+  29:Core/Src/lsm6dso_gyroscope.c ****                     I2C_MEMADD_SIZE_8BIT, &LSM6DSO_CTRL1XL_DATA, 1, 1000);
+  30:Core/Src/lsm6dso_gyroscope.c **** 
+  31:Core/Src/lsm6dso_gyroscope.c ****     if (HAL_OK != write_mem_ok)
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s 			page 2
+
+
+  32:Core/Src/lsm6dso_gyroscope.c ****     {
+  33:Core/Src/lsm6dso_gyroscope.c ****         return write_mem_ok;
+  34:Core/Src/lsm6dso_gyroscope.c ****     }
+  35:Core/Src/lsm6dso_gyroscope.c **** 
+  36:Core/Src/lsm6dso_gyroscope.c ****     /* Calibrate accelerometer */
+  37:Core/Src/lsm6dso_gyroscope.c ****     lsm6dso_calibrate_acc(ptr_i2c1);
+  38:Core/Src/lsm6dso_gyroscope.c **** 
+  39:Core/Src/lsm6dso_gyroscope.c ****     return write_mem_ok;
+  40:Core/Src/lsm6dso_gyroscope.c **** }
+  41:Core/Src/lsm6dso_gyroscope.c **** 
+  42:Core/Src/lsm6dso_gyroscope.c **** float lsm6dso_read_linear_acc(I2C_HandleTypeDef *ptr_i2c1)
+  43:Core/Src/lsm6dso_gyroscope.c **** {
+  44:Core/Src/lsm6dso_gyroscope.c ****     int16_t accX = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A);
+  45:Core/Src/lsm6dso_gyroscope.c **** 
+  46:Core/Src/lsm6dso_gyroscope.c ****     float acceleration = ((float)accX * LSM6DSO_ACC_SENSITIVITY) + accX_offset;
+  47:Core/Src/lsm6dso_gyroscope.c **** 
+  48:Core/Src/lsm6dso_gyroscope.c ****     return acceleration;
+  49:Core/Src/lsm6dso_gyroscope.c **** }
+  50:Core/Src/lsm6dso_gyroscope.c **** 
+  51:Core/Src/lsm6dso_gyroscope.c **** int16_t lsm6dso_read_acc_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t high_byte_reg, uint8_t low_byte_
+  52:Core/Src/lsm6dso_gyroscope.c **** {
+  28              		.loc 1 52 1 view -0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 8
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		.loc 1 52 1 is_stmt 0 view .LVU1
+  33 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+  34              		.cfi_def_cfa_offset 24
+  35              		.cfi_offset 4, -24
+  36              		.cfi_offset 5, -20
+  37              		.cfi_offset 6, -16
+  38              		.cfi_offset 7, -12
+  39              		.cfi_offset 8, -8
+  40              		.cfi_offset 14, -4
+  41 0004 86B0     		sub	sp, sp, #24
+  42              		.cfi_def_cfa_offset 48
+  43 0006 0646     		mov	r6, r0
+  44 0008 1746     		mov	r7, r2
+  53:Core/Src/lsm6dso_gyroscope.c ****     uint8_t high_byte_data = 0;
+  45              		.loc 1 53 5 is_stmt 1 view .LVU2
+  46              		.loc 1 53 13 is_stmt 0 view .LVU3
+  47 000a 0023     		movs	r3, #0
+  48 000c 8DF81730 		strb	r3, [sp, #23]
+  54:Core/Src/lsm6dso_gyroscope.c ****     uint8_t low_byte_data = 0;
+  49              		.loc 1 54 5 is_stmt 1 view .LVU4
+  50              		.loc 1 54 13 is_stmt 0 view .LVU5
+  51 0010 8DF81630 		strb	r3, [sp, #22]
+  55:Core/Src/lsm6dso_gyroscope.c **** 
+  56:Core/Src/lsm6dso_gyroscope.c ****     HAL_StatusTypeDef read_high_byte = HAL_I2C_Mem_Read(ptr_i2c1, LSM6DSO_ADD_REG, high_byte_reg,
+  52              		.loc 1 56 5 is_stmt 1 view .LVU6
+  53              		.loc 1 56 40 is_stmt 0 view .LVU7
+  54 0014 4FF0FF38 		mov	r8, #-1
+  55 0018 CDF80880 		str	r8, [sp, #8]
+  56 001c 0124     		movs	r4, #1
+  57 001e 0194     		str	r4, [sp, #4]
+  58 0020 0DF11703 		add	r3, sp, #23
+  59 0024 0093     		str	r3, [sp]
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s 			page 3
+
+
+  60 0026 2346     		mov	r3, r4
+  61 0028 0A46     		mov	r2, r1
+  62              	.LVL1:
+  63              		.loc 1 56 40 view .LVU8
+  64 002a D621     		movs	r1, #214
+  65              	.LVL2:
+  66              		.loc 1 56 40 view .LVU9
+  67 002c FFF7FEFF 		bl	HAL_I2C_Mem_Read
+  68              	.LVL3:
+  69              		.loc 1 56 40 view .LVU10
+  70 0030 0546     		mov	r5, r0
+  71              	.LVL4:
+  57:Core/Src/lsm6dso_gyroscope.c ****                      I2C_MEMADD_SIZE_8BIT, &high_byte_data, 1, HAL_MAX_DELAY);
+  58:Core/Src/lsm6dso_gyroscope.c ****     HAL_StatusTypeDef read_low_byte = HAL_I2C_Mem_Read(ptr_i2c1, LSM6DSO_ADD_REG, low_byte_reg,
+  72              		.loc 1 58 5 is_stmt 1 view .LVU11
+  73              		.loc 1 58 39 is_stmt 0 view .LVU12
+  74 0032 CDF80880 		str	r8, [sp, #8]
+  75 0036 0194     		str	r4, [sp, #4]
+  76 0038 0DF11603 		add	r3, sp, #22
+  77 003c 0093     		str	r3, [sp]
+  78 003e 2346     		mov	r3, r4
+  79 0040 3A46     		mov	r2, r7
+  80 0042 D621     		movs	r1, #214
+  81 0044 3046     		mov	r0, r6
+  82 0046 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+  83              	.LVL5:
+  59:Core/Src/lsm6dso_gyroscope.c ****                      I2C_MEMADD_SIZE_8BIT, &low_byte_data, 1, HAL_MAX_DELAY);
+  60:Core/Src/lsm6dso_gyroscope.c ****     
+  61:Core/Src/lsm6dso_gyroscope.c ****     if ( (HAL_OK != read_high_byte) || (HAL_OK != read_low_byte) )
+  84              		.loc 1 61 5 is_stmt 1 view .LVU13
+  85              		.loc 1 61 8 is_stmt 0 view .LVU14
+  86 004a 45B9     		cbnz	r5, .L3
+  87              		.loc 1 61 37 discriminator 1 view .LVU15
+  88 004c 58B9     		cbnz	r0, .L4
+  89              	.LBB2:
+  62:Core/Src/lsm6dso_gyroscope.c ****     {
+  63:Core/Src/lsm6dso_gyroscope.c ****         return 0;
+  64:Core/Src/lsm6dso_gyroscope.c ****     }
+  65:Core/Src/lsm6dso_gyroscope.c ****     else
+  66:Core/Src/lsm6dso_gyroscope.c ****     {
+  67:Core/Src/lsm6dso_gyroscope.c ****         int16_t combined_data = (high_byte_data << 8) | low_byte_data;
+  90              		.loc 1 67 9 is_stmt 1 view .LVU16
+  91              		.loc 1 67 55 is_stmt 0 view .LVU17
+  92 004e 9DF81700 		ldrb	r0, [sp, #23]	@ zero_extendqisi2
+  93              	.LVL6:
+  94              		.loc 1 67 55 view .LVU18
+  95 0052 0002     		lsls	r0, r0, #8
+  96 0054 00B2     		sxth	r0, r0
+  97 0056 9DF81630 		ldrb	r3, [sp, #22]	@ zero_extendqisi2
+  98              		.loc 1 67 17 view .LVU19
+  99 005a 1843     		orrs	r0, r0, r3
+ 100              	.LVL7:
+  68:Core/Src/lsm6dso_gyroscope.c ****         return combined_data;
+ 101              		.loc 1 68 9 is_stmt 1 view .LVU20
+ 102              		.loc 1 68 16 is_stmt 0 view .LVU21
+ 103 005c 00E0     		b	.L2
+ 104              	.LVL8:
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s 			page 4
+
+
+ 105              	.L3:
+ 106              		.loc 1 68 16 view .LVU22
+ 107              	.LBE2:
+  63:Core/Src/lsm6dso_gyroscope.c ****     }
+ 108              		.loc 1 63 16 view .LVU23
+ 109 005e 0020     		movs	r0, #0
+ 110              	.LVL9:
+ 111              	.L2:
+  69:Core/Src/lsm6dso_gyroscope.c ****     }
+  70:Core/Src/lsm6dso_gyroscope.c **** }
+ 112              		.loc 1 70 1 view .LVU24
+ 113 0060 06B0     		add	sp, sp, #24
+ 114              		.cfi_remember_state
+ 115              		.cfi_def_cfa_offset 24
+ 116              		@ sp needed
+ 117 0062 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 118              	.LVL10:
+ 119              	.L4:
+ 120              		.cfi_restore_state
+  63:Core/Src/lsm6dso_gyroscope.c ****     }
+ 121              		.loc 1 63 16 view .LVU25
+ 122 0066 0020     		movs	r0, #0
+ 123              	.LVL11:
+  63:Core/Src/lsm6dso_gyroscope.c ****     }
+ 124              		.loc 1 63 16 view .LVU26
+ 125 0068 FAE7     		b	.L2
+ 126              		.cfi_endproc
+ 127              	.LFE67:
+ 129              		.global	__aeabi_i2f
+ 130              		.global	__aeabi_fmul
+ 131              		.global	__aeabi_fadd
+ 132              		.section	.text.lsm6dso_read_linear_acc,"ax",%progbits
+ 133              		.align	1
+ 134              		.global	lsm6dso_read_linear_acc
+ 135              		.syntax unified
+ 136              		.thumb
+ 137              		.thumb_func
+ 139              	lsm6dso_read_linear_acc:
+ 140              	.LVL12:
+ 141              	.LFB66:
+  43:Core/Src/lsm6dso_gyroscope.c ****     int16_t accX = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A);
+ 142              		.loc 1 43 1 is_stmt 1 view -0
+ 143              		.cfi_startproc
+ 144              		@ args = 0, pretend = 0, frame = 0
+ 145              		@ frame_needed = 0, uses_anonymous_args = 0
+  43:Core/Src/lsm6dso_gyroscope.c ****     int16_t accX = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A);
+ 146              		.loc 1 43 1 is_stmt 0 view .LVU28
+ 147 0000 08B5     		push	{r3, lr}
+ 148              		.cfi_def_cfa_offset 8
+ 149              		.cfi_offset 3, -8
+ 150              		.cfi_offset 14, -4
+  44:Core/Src/lsm6dso_gyroscope.c **** 
+ 151              		.loc 1 44 5 is_stmt 1 view .LVU29
+  44:Core/Src/lsm6dso_gyroscope.c **** 
+ 152              		.loc 1 44 20 is_stmt 0 view .LVU30
+ 153 0002 2822     		movs	r2, #40
+ 154 0004 2921     		movs	r1, #41
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s 			page 5
+
+
+ 155 0006 FFF7FEFF 		bl	lsm6dso_read_acc_axis
+ 156              	.LVL13:
+  46:Core/Src/lsm6dso_gyroscope.c **** 
+ 157              		.loc 1 46 5 is_stmt 1 view .LVU31
+  46:Core/Src/lsm6dso_gyroscope.c **** 
+ 158              		.loc 1 46 27 is_stmt 0 view .LVU32
+ 159 000a FFF7FEFF 		bl	__aeabi_i2f
+ 160              	.LVL14:
+  46:Core/Src/lsm6dso_gyroscope.c **** 
+ 161              		.loc 1 46 39 view .LVU33
+ 162 000e 0449     		ldr	r1, .L8
+ 163 0010 FFF7FEFF 		bl	__aeabi_fmul
+ 164              	.LVL15:
+  46:Core/Src/lsm6dso_gyroscope.c **** 
+ 165              		.loc 1 46 11 view .LVU34
+ 166 0014 034B     		ldr	r3, .L8+4
+ 167 0016 1968     		ldr	r1, [r3]	@ float
+ 168 0018 FFF7FEFF 		bl	__aeabi_fadd
+ 169              	.LVL16:
+  48:Core/Src/lsm6dso_gyroscope.c **** }
+ 170              		.loc 1 48 5 is_stmt 1 view .LVU35
+  49:Core/Src/lsm6dso_gyroscope.c **** 
+ 171              		.loc 1 49 1 is_stmt 0 view .LVU36
+ 172 001c 08BD     		pop	{r3, pc}
+ 173              	.L9:
+ 174 001e 00BF     		.align	2
+ 175              	.L8:
+ 176 0020 23DBF93D 		.word	1039784739
+ 177 0024 00000000 		.word	accX_offset
+ 178              		.cfi_endproc
+ 179              	.LFE66:
+ 181              		.global	__aeabi_fdiv
+ 182              		.section	.text.lsm6dso_calibrate_acc,"ax",%progbits
+ 183              		.align	1
+ 184              		.global	lsm6dso_calibrate_acc
+ 185              		.syntax unified
+ 186              		.thumb
+ 187              		.thumb_func
+ 189              	lsm6dso_calibrate_acc:
+ 190              	.LVL17:
+ 191              	.LFB68:
+  71:Core/Src/lsm6dso_gyroscope.c **** 
+  72:Core/Src/lsm6dso_gyroscope.c **** void lsm6dso_calibrate_acc(I2C_HandleTypeDef *ptr_i2c1)
+  73:Core/Src/lsm6dso_gyroscope.c **** {
+ 192              		.loc 1 73 1 is_stmt 1 view -0
+ 193              		.cfi_startproc
+ 194              		@ args = 0, pretend = 0, frame = 0
+ 195              		@ frame_needed = 0, uses_anonymous_args = 0
+ 196              		.loc 1 73 1 is_stmt 0 view .LVU38
+ 197 0000 70B5     		push	{r4, r5, r6, lr}
+ 198              		.cfi_def_cfa_offset 16
+ 199              		.cfi_offset 4, -16
+ 200              		.cfi_offset 5, -12
+ 201              		.cfi_offset 6, -8
+ 202              		.cfi_offset 14, -4
+ 203 0002 0646     		mov	r6, r0
+  74:Core/Src/lsm6dso_gyroscope.c ****     /* Read and average 100 samples of accelerometer data */
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s 			page 6
+
+
+  75:Core/Src/lsm6dso_gyroscope.c ****     const uint8_t NUM_SAMPLES = 100;
+ 204              		.loc 1 75 5 is_stmt 1 view .LVU39
+ 205              	.LVL18:
+  76:Core/Src/lsm6dso_gyroscope.c ****     float accX_sum = 0.0f;
+ 206              		.loc 1 76 5 view .LVU40
+  77:Core/Src/lsm6dso_gyroscope.c ****     float accY_sum = 0.0f;
+ 207              		.loc 1 77 5 view .LVU41
+  78:Core/Src/lsm6dso_gyroscope.c ****     float accZ_sum = 0.0f;
+ 208              		.loc 1 78 5 view .LVU42
+  79:Core/Src/lsm6dso_gyroscope.c **** 
+  80:Core/Src/lsm6dso_gyroscope.c ****     for (uint8_t i = 0; i < NUM_SAMPLES; i++)
+ 209              		.loc 1 80 5 view .LVU43
+ 210              	.LBB3:
+ 211              		.loc 1 80 10 view .LVU44
+ 212              		.loc 1 80 18 is_stmt 0 view .LVU45
+ 213 0004 0024     		movs	r4, #0
+ 214              	.LBE3:
+  76:Core/Src/lsm6dso_gyroscope.c ****     float accY_sum = 0.0f;
+ 215              		.loc 1 76 11 view .LVU46
+ 216 0006 0025     		movs	r5, #0
+ 217              	.LBB5:
+ 218              		.loc 1 80 5 view .LVU47
+ 219 0008 10E0     		b	.L11
+ 220              	.LVL19:
+ 221              	.L12:
+ 222              	.LBB4:
+  81:Core/Src/lsm6dso_gyroscope.c ****     {
+  82:Core/Src/lsm6dso_gyroscope.c ****         int16_t accX_raw = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A);
+ 223              		.loc 1 82 9 is_stmt 1 view .LVU48
+ 224              		.loc 1 82 28 is_stmt 0 view .LVU49
+ 225 000a 2822     		movs	r2, #40
+ 226 000c 2921     		movs	r1, #41
+ 227 000e 3046     		mov	r0, r6
+ 228 0010 FFF7FEFF 		bl	lsm6dso_read_acc_axis
+ 229              	.LVL20:
+  83:Core/Src/lsm6dso_gyroscope.c ****         // int16_t accY_raw = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTY_H_A, LSM6DSO_OUTY_L_A);
+  84:Core/Src/lsm6dso_gyroscope.c ****         // int16_t accZ_raw = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTZ_H_A, LSM6DSO_OUTZ_L_A);
+  85:Core/Src/lsm6dso_gyroscope.c **** 
+  86:Core/Src/lsm6dso_gyroscope.c ****         accX_sum += (float)accX_raw;
+ 230              		.loc 1 86 9 is_stmt 1 view .LVU50
+ 231              		.loc 1 86 21 is_stmt 0 view .LVU51
+ 232 0014 FFF7FEFF 		bl	__aeabi_i2f
+ 233              	.LVL21:
+ 234              		.loc 1 86 21 view .LVU52
+ 235 0018 0146     		mov	r1, r0
+ 236              		.loc 1 86 18 view .LVU53
+ 237 001a 2846     		mov	r0, r5
+ 238 001c FFF7FEFF 		bl	__aeabi_fadd
+ 239              	.LVL22:
+ 240 0020 0546     		mov	r5, r0
+ 241              	.LVL23:
+  87:Core/Src/lsm6dso_gyroscope.c ****         // accY_sum += (float)accY_raw;
+  88:Core/Src/lsm6dso_gyroscope.c ****         // accZ_sum += (float)accZ_raw;
+  89:Core/Src/lsm6dso_gyroscope.c **** 
+  90:Core/Src/lsm6dso_gyroscope.c ****         HAL_Delay(10);
+ 242              		.loc 1 90 9 is_stmt 1 view .LVU54
+ 243 0022 0A20     		movs	r0, #10
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s 			page 7
+
+
+ 244              	.LVL24:
+ 245              		.loc 1 90 9 is_stmt 0 view .LVU55
+ 246 0024 FFF7FEFF 		bl	HAL_Delay
+ 247              	.LVL25:
+ 248              	.LBE4:
+  80:Core/Src/lsm6dso_gyroscope.c ****     {
+ 249              		.loc 1 80 43 is_stmt 1 discriminator 3 view .LVU56
+ 250 0028 0134     		adds	r4, r4, #1
+ 251              	.LVL26:
+  80:Core/Src/lsm6dso_gyroscope.c ****     {
+ 252              		.loc 1 80 43 is_stmt 0 discriminator 3 view .LVU57
+ 253 002a E4B2     		uxtb	r4, r4
+ 254              	.LVL27:
+ 255              	.L11:
+  80:Core/Src/lsm6dso_gyroscope.c ****     {
+ 256              		.loc 1 80 27 is_stmt 1 discriminator 1 view .LVU58
+ 257 002c 632C     		cmp	r4, #99
+ 258 002e ECD9     		bls	.L12
+ 259              	.LBE5:
+  91:Core/Src/lsm6dso_gyroscope.c ****     }
+  92:Core/Src/lsm6dso_gyroscope.c **** 
+  93:Core/Src/lsm6dso_gyroscope.c ****     float accX_avg = accX_sum / (float)NUM_SAMPLES;
+ 260              		.loc 1 93 5 view .LVU59
+ 261              		.loc 1 93 11 is_stmt 0 view .LVU60
+ 262 0030 0949     		ldr	r1, .L14
+ 263 0032 2846     		mov	r0, r5
+ 264 0034 FFF7FEFF 		bl	__aeabi_fdiv
+ 265              	.LVL28:
+  94:Core/Src/lsm6dso_gyroscope.c ****     float accY_avg = accY_sum / (float)NUM_SAMPLES;
+ 266              		.loc 1 94 5 is_stmt 1 view .LVU61
+  95:Core/Src/lsm6dso_gyroscope.c ****     float accZ_avg = accZ_sum / (float)NUM_SAMPLES;
+ 267              		.loc 1 95 5 view .LVU62
+  96:Core/Src/lsm6dso_gyroscope.c **** 
+  97:Core/Src/lsm6dso_gyroscope.c ****     /* Calculate accelerometer offsets */
+  98:Core/Src/lsm6dso_gyroscope.c ****     accX_offset = -accX_avg * LSM6DSO_ACC_SENSITIVITY;
+ 268              		.loc 1 98 5 view .LVU63
+ 269              		.loc 1 98 19 is_stmt 0 view .LVU64
+ 270 0038 00F10040 		add	r0, r0, #-2147483648
+ 271              	.LVL29:
+ 272              		.loc 1 98 29 view .LVU65
+ 273 003c 0749     		ldr	r1, .L14+4
+ 274 003e FFF7FEFF 		bl	__aeabi_fmul
+ 275              	.LVL30:
+ 276              		.loc 1 98 17 view .LVU66
+ 277 0042 074B     		ldr	r3, .L14+8
+ 278 0044 1860     		str	r0, [r3]	@ float
+  99:Core/Src/lsm6dso_gyroscope.c ****     accY_offset = -accY_avg * LSM6DSO_ACC_SENSITIVITY;
+ 279              		.loc 1 99 5 is_stmt 1 view .LVU67
+ 280              		.loc 1 99 17 is_stmt 0 view .LVU68
+ 281 0046 074B     		ldr	r3, .L14+12
+ 282 0048 4FF00042 		mov	r2, #-2147483648
+ 283 004c 1A60     		str	r2, [r3]	@ float
+ 100:Core/Src/lsm6dso_gyroscope.c ****     accZ_offset = (1.0f - accZ_avg) * LSM6DSO_ACC_SENSITIVITY;
+ 284              		.loc 1 100 5 is_stmt 1 view .LVU69
+ 285              		.loc 1 100 17 is_stmt 0 view .LVU70
+ 286 004e 064B     		ldr	r3, .L14+16
+ 287 0050 024A     		ldr	r2, .L14+4
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s 			page 8
+
+
+ 288 0052 1A60     		str	r2, [r3]	@ float
+ 101:Core/Src/lsm6dso_gyroscope.c **** }
+ 289              		.loc 1 101 1 view .LVU71
+ 290 0054 70BD     		pop	{r4, r5, r6, pc}
+ 291              	.LVL31:
+ 292              	.L15:
+ 293              		.loc 1 101 1 view .LVU72
+ 294 0056 00BF     		.align	2
+ 295              	.L14:
+ 296 0058 0000C842 		.word	1120403456
+ 297 005c 23DBF93D 		.word	1039784739
+ 298 0060 00000000 		.word	accX_offset
+ 299 0064 00000000 		.word	accY_offset
+ 300 0068 00000000 		.word	accZ_offset
+ 301              		.cfi_endproc
+ 302              	.LFE68:
+ 304              		.section	.text.lsm6dso_init,"ax",%progbits
+ 305              		.align	1
+ 306              		.global	lsm6dso_init
+ 307              		.syntax unified
+ 308              		.thumb
+ 309              		.thumb_func
+ 311              	lsm6dso_init:
+ 312              	.LVL32:
+ 313              	.LFB65:
+  26:Core/Src/lsm6dso_gyroscope.c ****     /* Set accelerometer to 2g full scale range and 104 Hz output data rate */
+ 314              		.loc 1 26 1 is_stmt 1 view -0
+ 315              		.cfi_startproc
+ 316              		@ args = 0, pretend = 0, frame = 0
+ 317              		@ frame_needed = 0, uses_anonymous_args = 0
+  26:Core/Src/lsm6dso_gyroscope.c ****     /* Set accelerometer to 2g full scale range and 104 Hz output data rate */
+ 318              		.loc 1 26 1 is_stmt 0 view .LVU74
+ 319 0000 30B5     		push	{r4, r5, lr}
+ 320              		.cfi_def_cfa_offset 12
+ 321              		.cfi_offset 4, -12
+ 322              		.cfi_offset 5, -8
+ 323              		.cfi_offset 14, -4
+ 324 0002 85B0     		sub	sp, sp, #20
+ 325              		.cfi_def_cfa_offset 32
+ 326 0004 0446     		mov	r4, r0
+  28:Core/Src/lsm6dso_gyroscope.c ****                     I2C_MEMADD_SIZE_8BIT, &LSM6DSO_CTRL1XL_DATA, 1, 1000);
+ 327              		.loc 1 28 5 is_stmt 1 view .LVU75
+  28:Core/Src/lsm6dso_gyroscope.c ****                     I2C_MEMADD_SIZE_8BIT, &LSM6DSO_CTRL1XL_DATA, 1, 1000);
+ 328              		.loc 1 28 38 is_stmt 0 view .LVU76
+ 329 0006 4FF47A73 		mov	r3, #1000
+ 330 000a 0293     		str	r3, [sp, #8]
+ 331 000c 0123     		movs	r3, #1
+ 332 000e 0193     		str	r3, [sp, #4]
+ 333 0010 074A     		ldr	r2, .L20
+ 334 0012 0092     		str	r2, [sp]
+ 335 0014 1022     		movs	r2, #16
+ 336 0016 D621     		movs	r1, #214
+ 337 0018 FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 338              	.LVL33:
+  31:Core/Src/lsm6dso_gyroscope.c ****     {
+ 339              		.loc 1 31 5 is_stmt 1 view .LVU77
+  31:Core/Src/lsm6dso_gyroscope.c ****     {
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s 			page 9
+
+
+ 340              		.loc 1 31 8 is_stmt 0 view .LVU78
+ 341 001c 0546     		mov	r5, r0
+ 342 001e 10B1     		cbz	r0, .L19
+ 343              	.LVL34:
+ 344              	.L17:
+  40:Core/Src/lsm6dso_gyroscope.c **** 
+ 345              		.loc 1 40 1 view .LVU79
+ 346 0020 2846     		mov	r0, r5
+ 347 0022 05B0     		add	sp, sp, #20
+ 348              		.cfi_remember_state
+ 349              		.cfi_def_cfa_offset 12
+ 350              		@ sp needed
+ 351 0024 30BD     		pop	{r4, r5, pc}
+ 352              	.LVL35:
+ 353              	.L19:
+ 354              		.cfi_restore_state
+  37:Core/Src/lsm6dso_gyroscope.c **** 
+ 355              		.loc 1 37 5 is_stmt 1 view .LVU80
+ 356 0026 2046     		mov	r0, r4
+ 357              	.LVL36:
+  37:Core/Src/lsm6dso_gyroscope.c **** 
+ 358              		.loc 1 37 5 is_stmt 0 view .LVU81
+ 359 0028 FFF7FEFF 		bl	lsm6dso_calibrate_acc
+ 360              	.LVL37:
+  39:Core/Src/lsm6dso_gyroscope.c **** }
+ 361              		.loc 1 39 5 is_stmt 1 view .LVU82
+  39:Core/Src/lsm6dso_gyroscope.c **** }
+ 362              		.loc 1 39 12 is_stmt 0 view .LVU83
+ 363 002c F8E7     		b	.L17
+ 364              	.L21:
+ 365 002e 00BF     		.align	2
+ 366              	.L20:
+ 367 0030 00000000 		.word	LSM6DSO_CTRL1XL_DATA
+ 368              		.cfi_endproc
+ 369              	.LFE65:
+ 371              		.global	accZ_offset
+ 372              		.section	.bss.accZ_offset,"aw",%nobits
+ 373              		.align	2
+ 376              	accZ_offset:
+ 377 0000 00000000 		.space	4
+ 378              		.global	accY_offset
+ 379              		.section	.bss.accY_offset,"aw",%nobits
+ 380              		.align	2
+ 383              	accY_offset:
+ 384 0000 00000000 		.space	4
+ 385              		.global	accX_offset
+ 386              		.section	.bss.accX_offset,"aw",%nobits
+ 387              		.align	2
+ 390              	accX_offset:
+ 391 0000 00000000 		.space	4
+ 392              		.global	LSM6DSO_ACC_SENSITIVITY
+ 393              		.section	.rodata.LSM6DSO_ACC_SENSITIVITY,"a"
+ 394              		.align	2
+ 397              	LSM6DSO_ACC_SENSITIVITY:
+ 398 0000 23DBF93D 		.word	1039784739
+ 399              		.global	LSM6DSO_CTRL1XL_DATA
+ 400              		.section	.rodata.LSM6DSO_CTRL1XL_DATA,"a"
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s 			page 10
+
+
+ 403              	LSM6DSO_CTRL1XL_DATA:
+ 404 0000 44       		.byte	68
+ 405              		.global	LSM6DSO_CTRL6_C
+ 406              		.section	.rodata.LSM6DSO_CTRL6_C,"a"
+ 409              	LSM6DSO_CTRL6_C:
+ 410 0000 15       		.byte	21
+ 411              		.global	LSM6DSO_CTRL1_XL
+ 412              		.section	.rodata.LSM6DSO_CTRL1_XL,"a"
+ 415              	LSM6DSO_CTRL1_XL:
+ 416 0000 10       		.byte	16
+ 417              		.global	LSM6DSO_OUTX_H_A
+ 418              		.section	.rodata.LSM6DSO_OUTX_H_A,"a"
+ 421              	LSM6DSO_OUTX_H_A:
+ 422 0000 29       		.byte	41
+ 423              		.global	LSM6DSO_OUTX_L_A
+ 424              		.section	.rodata.LSM6DSO_OUTX_L_A,"a"
+ 427              	LSM6DSO_OUTX_L_A:
+ 428 0000 28       		.byte	40
+ 429              		.global	LSM6DSO_ADD_REG
+ 430              		.section	.rodata.LSM6DSO_ADD_REG,"a"
+ 433              	LSM6DSO_ADD_REG:
+ 434 0000 D6       		.byte	-42
+ 435              		.text
+ 436              	.Letext0:
+ 437              		.file 2 "C:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 438              		.file 3 "C:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-to
+ 439              		.file 4 "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f103xb.h"
+ 440              		.file 5 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
+ 441              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
+ 442              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h"
+ 443              		.file 8 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h"
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s 			page 11
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 lsm6dso_gyroscope.c
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:19     .text.lsm6dso_read_acc_axis:00000000 $t
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:25     .text.lsm6dso_read_acc_axis:00000000 lsm6dso_read_acc_axis
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:133    .text.lsm6dso_read_linear_acc:00000000 $t
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:139    .text.lsm6dso_read_linear_acc:00000000 lsm6dso_read_linear_acc
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:176    .text.lsm6dso_read_linear_acc:00000020 $d
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:390    .bss.accX_offset:00000000 accX_offset
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:183    .text.lsm6dso_calibrate_acc:00000000 $t
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:189    .text.lsm6dso_calibrate_acc:00000000 lsm6dso_calibrate_acc
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:296    .text.lsm6dso_calibrate_acc:00000058 $d
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:383    .bss.accY_offset:00000000 accY_offset
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:376    .bss.accZ_offset:00000000 accZ_offset
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:305    .text.lsm6dso_init:00000000 $t
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:311    .text.lsm6dso_init:00000000 lsm6dso_init
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:367    .text.lsm6dso_init:00000030 $d
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:403    .rodata.LSM6DSO_CTRL1XL_DATA:00000000 LSM6DSO_CTRL1XL_DATA
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:373    .bss.accZ_offset:00000000 $d
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:380    .bss.accY_offset:00000000 $d
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:387    .bss.accX_offset:00000000 $d
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:397    .rodata.LSM6DSO_ACC_SENSITIVITY:00000000 LSM6DSO_ACC_SENSITIVITY
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:394    .rodata.LSM6DSO_ACC_SENSITIVITY:00000000 $d
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:409    .rodata.LSM6DSO_CTRL6_C:00000000 LSM6DSO_CTRL6_C
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:415    .rodata.LSM6DSO_CTRL1_XL:00000000 LSM6DSO_CTRL1_XL
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:421    .rodata.LSM6DSO_OUTX_H_A:00000000 LSM6DSO_OUTX_H_A
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:427    .rodata.LSM6DSO_OUTX_L_A:00000000 LSM6DSO_OUTX_L_A
+C:\Users\vmyhr\AppData\Local\Temp\ccDqIlQL.s:433    .rodata.LSM6DSO_ADD_REG:00000000 LSM6DSO_ADD_REG
 
-NO UNDEFINED SYMBOLS
+UNDEFINED SYMBOLS
+HAL_I2C_Mem_Read
+__aeabi_i2f
+__aeabi_fmul
+__aeabi_fadd
+__aeabi_fdiv
+HAL_Delay
+HAL_I2C_Mem_Write

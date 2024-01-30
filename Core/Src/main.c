@@ -23,6 +23,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stts751_temp_sensor.h"
+#include "lsm6dso_gyroscope.h"
+#include "math.h"
+#include "stdint.h"
+#include "stdlib.h"
+#include "string.h"
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,30 +54,30 @@ UART_HandleTypeDef huart2;
 /* Definitions for PresentData */
 osThreadId_t PresentDataHandle;
 const osThreadAttr_t PresentData_attributes = {
-  .name = "PresentData",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityHigh,
+    .name = "PresentData",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityHigh,
 };
 /* Definitions for TempRead */
 osThreadId_t TempReadHandle;
 const osThreadAttr_t TempRead_attributes = {
-  .name = "TempRead",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityBelowNormal,
+    .name = "TempRead",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityBelowNormal,
 };
 /* Definitions for GyroRead */
 osThreadId_t GyroReadHandle;
 const osThreadAttr_t GyroRead_attributes = {
-  .name = "GyroRead",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+    .name = "GyroRead",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for myTask04 */
 osThreadId_t myTask04Handle;
 const osThreadAttr_t myTask04_attributes = {
-  .name = "myTask04",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+    .name = "myTask04",
+    .stack_size = 128 * 4,
+    .priority = (osPriority_t)osPriorityLow,
 };
 /* USER CODE BEGIN PV */
 
@@ -97,9 +103,9 @@ void StartTask04(void *argument);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
+ * @brief  The application entry point.
+ * @retval int
+ */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
@@ -186,17 +192,17 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
+ * @brief System Clock Configuration
+ * @retval None
+ */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
+   * in the RCC_OscInitTypeDef structure.
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_BYPASS;
   RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
@@ -210,9 +216,8 @@ void SystemClock_Config(void)
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
@@ -225,10 +230,10 @@ void SystemClock_Config(void)
 }
 
 /**
-  * @brief I2C1 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief I2C1 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_I2C1_Init(void)
 {
 
@@ -255,14 +260,13 @@ static void MX_I2C1_Init(void)
   /* USER CODE BEGIN I2C1_Init 2 */
 
   /* USER CODE END I2C1_Init 2 */
-
 }
 
 /**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief USART2 Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_USART2_UART_Init(void)
 {
 
@@ -288,19 +292,18 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
-
 }
 
 /**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
+ * @brief GPIO Initialization Function
+ * @param None
+ * @retval None
+ */
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -328,8 +331,8 @@ static void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
@@ -337,44 +340,59 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN Header_data_presentation_thread */
 /**
-  * @brief  Function implementing the PresentData thread.
-  * @param  argument: Not used
-  * @retval None
-  */
+ * @brief  Function implementing the PresentData thread.
+ * @param  argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_data_presentation_thread */
 void data_presentation_thread(void *argument)
 {
   /* USER CODE BEGIN 5 */
   // test = stts751_init(&hi2c1);
   float temperature = 0.0f;
-  uint8_t buffer[32];
+  char buffer[32];
+  uint8_t lsm6dso_ok = lsm6dso_init(&hi2c1);
+  float accX = 0.0f;
+
   /* Infinite loop */
   for (;;)
   {
-    /* Read Data */
-    temperature = stts751_read_temperature(&hi2c1);
+    if (HAL_OK != lsm6dso_ok)
+    {
+      sprintf(buffer, "%d\r\n", lsm6dso_ok);
+      HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
+      osDelay(1000);
+    }
+    else
+    {
+      /* Read Data */
+      temperature = stts751_read_temperature(&hi2c1);
+      accX = lsm6dso_read_linear_acc(&hi2c1);
 
-    /* Print data */
-    int temp_int = (int)(temperature * 100); // Convert to an integer
-    sprintf(buffer, "Temperature: %d.%02d C\r\n", temp_int / 100, temp_int % 100);
-    HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
-    osDelay(1000);
+      /* Print data */
+      int accx_int = (int)(accX * 100);
+      int temp_int = (float)(temperature * 100); // Convert to an integer
+      sprintf(buffer, "Temperature: %d.%02d C, AccX: %d.%02d \r\n", temp_int / 100, temp_int % 100, accx_int / 100, accx_int % 100);
+
+      HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
+      osDelay(100);
+    }
   }
   /* USER CODE END 5 */
 }
 
 /* USER CODE BEGIN Header_read_temperature_thread */
 /**
-* @brief Function implementing the TempRead thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the TempRead thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_read_temperature_thread */
 void read_temperature_thread(void *argument)
 {
   /* USER CODE BEGIN read_temperature_thread */
   /* Infinite loop */
-  for(;;)
+  for (;;)
   {
     osDelay(1);
   }
@@ -383,16 +401,16 @@ void read_temperature_thread(void *argument)
 
 /* USER CODE BEGIN Header_read_gyrodata_thread */
 /**
-* @brief Function implementing the GyroRead thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the GyroRead thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_read_gyrodata_thread */
 void read_gyrodata_thread(void *argument)
 {
   /* USER CODE BEGIN read_gyrodata_thread */
   /* Infinite loop */
-  for(;;)
+  for (;;)
   {
     osDelay(1);
   }
@@ -401,16 +419,16 @@ void read_gyrodata_thread(void *argument)
 
 /* USER CODE BEGIN Header_StartTask04 */
 /**
-* @brief Function implementing the myTask04 thread.
-* @param argument: Not used
-* @retval None
-*/
+ * @brief Function implementing the myTask04 thread.
+ * @param argument: Not used
+ * @retval None
+ */
 /* USER CODE END Header_StartTask04 */
 void StartTask04(void *argument)
 {
   /* USER CODE BEGIN StartTask04 */
   /* Infinite loop */
-  for(;;)
+  for (;;)
   {
     osDelay(1);
   }
@@ -418,19 +436,20 @@ void StartTask04(void *argument)
 }
 
 /**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM4 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
+ * @brief  Period elapsed callback in non blocking mode
+ * @note   This function is called  when TIM4 interrupt took place, inside
+ * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+ * a global variable "uwTick" used as application time base.
+ * @param  htim : TIM handle
+ * @retval None
+ */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM4) {
+  if (htim->Instance == TIM4)
+  {
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
@@ -439,9 +458,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 }
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -453,14 +472,14 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
