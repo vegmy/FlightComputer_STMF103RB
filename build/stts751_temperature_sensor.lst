@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 1
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s 			page 1
 
 
    1              		.cpu cortex-m3
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 1
   37              		.cfi_def_cfa_offset 24
   20:Core/Src/stts751_temperature_sensor.c ****     uint8_t write_memory_ok = 1;
   38              		.loc 1 20 5 is_stmt 1 view .LVU2
-ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 2
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s 			page 2
 
 
   39              	.LVL1:
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 1
   72              	.LVL5:
   29:Core/Src/stts751_temperature_sensor.c ****         break;
   73              		.loc 1 29 25 view .LVU11
-ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 3
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s 			page 3
 
 
   74 0026 FAE7     		b	.L2
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 1
  119 0014 0093     		str	r3, [sp]
  120 0016 2346     		mov	r3, r4
  121 0018 0022     		movs	r2, #0
-ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 4
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s 			page 4
 
 
  122 001a 9421     		movs	r1, #148
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 1
  160              		.loc 1 66 12 is_stmt 0 view .LVU35
  161 004a 002B     		cmp	r3, #0
  162 004c 03DA     		bge	.L7
-ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 5
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s 			page 5
 
 
   67:Core/Src/stts751_temperature_sensor.c ****         temperature_combined |= 0xF000;
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 1
  209              		.section	.rodata.STTS751_REG_SIZE,"a"
  212              	STTS751_REG_SIZE:
  213 0000 01       		.byte	1
-ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 6
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s 			page 6
 
 
  214              		.global	STTS751_CONV_DATA
@@ -341,27 +341,27 @@ ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 1
  267              		.file 5 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h"
  268              		.file 6 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h"
  269              		.file 7 "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h"
-ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s 			page 7
+ARM GAS  C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s 			page 7
 
 
 DEFINED SYMBOLS
                             *ABS*:00000000 stts751_temperature_sensor.c
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:19     .text.stts751_init:00000000 $t
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:25     .text.stts751_init:00000000 stts751_init
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:81     .text.stts751_read_temperature:00000000 $t
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:87     .text.stts751_read_temperature:00000000 stts751_read_temperature
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:198    .text.stts751_read_temperature:0000006c $d
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:206    .rodata.STTS751_DATA_SIZE:00000000 STTS751_DATA_SIZE
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:212    .rodata.STTS751_REG_SIZE:00000000 STTS751_REG_SIZE
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:218    .rodata.STTS751_CONV_DATA:00000000 STTS751_CONV_DATA
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:224    .rodata.STTS751_CONF_DATA:00000000 STTS751_CONF_DATA
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:230    .rodata.STTS751_ADDR_REG:00000000 STTS751_ADDR_REG
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:236    .rodata.STTS751_CONV_REG:00000000 STTS751_CONV_REG
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:242    .rodata.STTS751_CONF_REG:00000000 STTS751_CONF_REG
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:248    .rodata.STTS751_LOW_BYTE_REG:00000000 STTS751_LOW_BYTE_REG
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:254    .rodata.STTS751_STATUS_REG:00000000 STTS751_STATUS_REG
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:260    .rodata.STTS751_HIGH_BYTE_REG:00000000 STTS751_HIGH_BYTE_REG
-C:\Users\vmyhr\AppData\Local\Temp\ccHwXs79.s:261    .rodata.STTS751_HIGH_BYTE_REG:00000000 $d
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:19     .text.stts751_init:00000000 $t
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:25     .text.stts751_init:00000000 stts751_init
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:81     .text.stts751_read_temperature:00000000 $t
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:87     .text.stts751_read_temperature:00000000 stts751_read_temperature
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:198    .text.stts751_read_temperature:0000006c $d
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:206    .rodata.STTS751_DATA_SIZE:00000000 STTS751_DATA_SIZE
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:212    .rodata.STTS751_REG_SIZE:00000000 STTS751_REG_SIZE
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:218    .rodata.STTS751_CONV_DATA:00000000 STTS751_CONV_DATA
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:224    .rodata.STTS751_CONF_DATA:00000000 STTS751_CONF_DATA
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:230    .rodata.STTS751_ADDR_REG:00000000 STTS751_ADDR_REG
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:236    .rodata.STTS751_CONV_REG:00000000 STTS751_CONV_REG
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:242    .rodata.STTS751_CONF_REG:00000000 STTS751_CONF_REG
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:248    .rodata.STTS751_LOW_BYTE_REG:00000000 STTS751_LOW_BYTE_REG
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:254    .rodata.STTS751_STATUS_REG:00000000 STTS751_STATUS_REG
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:260    .rodata.STTS751_HIGH_BYTE_REG:00000000 STTS751_HIGH_BYTE_REG
+C:\Users\vmyhr\AppData\Local\Temp\ccGeUSe6.s:261    .rodata.STTS751_HIGH_BYTE_REG:00000000 $d
 
 UNDEFINED SYMBOLS
 HAL_I2C_Mem_Write

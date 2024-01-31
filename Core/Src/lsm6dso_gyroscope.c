@@ -7,6 +7,13 @@ const uint8_t LSM6DSO_ADD_REG = 0xD6;
 /* LSM6DSO acceleration registers */
 const uint8_t LSM6DSO_OUTX_L_A = 0x28;
 const uint8_t LSM6DSO_OUTX_H_A = 0x29;
+const uint8_t LSM6DSO_OUTY_L_A = 0x2A;
+const uint8_t LSM6DSO_OUTY_H_A = 0x2B;
+const uint8_t LSM6DSO_OUTZ_L_A = 0x2C;
+const uint8_t LSM6DSO_OUTZ_H_A = 0x2D;
+
+
+
 
 /* LSM6DSO control registers */
 const uint8_t LSM6DSO_CTRL1_XL = 0x10;
@@ -20,6 +27,7 @@ const float LSM6DSO_ACC_SENSITIVITY = 0.122f;
 float accX_offset = 0.0f;
 float accY_offset = 0.0f;
 float accZ_offset = 0.0f;
+
 
 
 HAL_StatusTypeDef lsm6dso_init(I2C_HandleTypeDef *ptr_i2c1)
@@ -41,14 +49,16 @@ HAL_StatusTypeDef lsm6dso_init(I2C_HandleTypeDef *ptr_i2c1)
 
 float lsm6dso_read_linear_acc(I2C_HandleTypeDef *ptr_i2c1)
 {
-    int16_t accX = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A);
+    float accX = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A, accX_offset);
+    float accY = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTY_H_A, LSM6DSO_OUTY_L_A, accY_offset);
+    float accZ = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTZ_H_A, LSM6DSO_OUTZ_L_A, accZ_offset);
 
-    float acceleration = ((float)accX * LSM6DSO_ACC_SENSITIVITY) + accX_offset;
+    float acceleration = sqrt(accX * accX + accY * accY + accZ * accZ);
 
     return acceleration;
 }
 
-int16_t lsm6dso_read_acc_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t high_byte_reg, uint8_t low_byte_reg)
+float lsm6dso_read_acc_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t high_byte_reg, uint8_t low_byte_reg, float acc_axis_offset)
 {
     uint8_t high_byte_data = 0;
     uint8_t low_byte_data = 0;
@@ -65,7 +75,9 @@ int16_t lsm6dso_read_acc_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t high_byte_reg
     else
     {
         int16_t combined_data = (high_byte_data << 8) | low_byte_data;
-        return combined_data;
+
+        float acceleration = ((float)combined_data * LSM6DSO_ACC_SENSITIVITY) + acc_axis_offset;
+        return acceleration;
     }
 }
 
@@ -79,13 +91,13 @@ void lsm6dso_calibrate_acc(I2C_HandleTypeDef *ptr_i2c1)
 
     for (uint8_t i = 0; i < NUM_SAMPLES; i++)
     {
-        int16_t accX_raw = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A);
-        // int16_t accY_raw = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTY_H_A, LSM6DSO_OUTY_L_A);
-        // int16_t accZ_raw = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTZ_H_A, LSM6DSO_OUTZ_L_A);
+        float accX_raw = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A, accX_offset);
+        float accY_raw = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTY_H_A, LSM6DSO_OUTY_L_A, accY_offset);
+        float accZ_raw = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTZ_H_A, LSM6DSO_OUTZ_L_A, accZ_offset);
 
-        accX_sum += (float)accX_raw;
-        // accY_sum += (float)accY_raw;
-        // accZ_sum += (float)accZ_raw;
+        accX_sum += accX_raw;
+        accY_sum += accY_raw;
+        accZ_sum += accZ_raw;
 
         HAL_Delay(10);
     }
