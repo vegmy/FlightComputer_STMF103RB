@@ -348,11 +348,8 @@ static void MX_GPIO_Init(void)
 void data_presentation_thread(void *argument)
 {
   /* USER CODE BEGIN 5 */
-  // test = stts751_init(&hi2c1);
-  float temperature = 0.0f;
   char buffer[32];
   uint8_t lsm6dso_ok = lsm6dso_init(&hi2c1);
-  float accX = 0.0f;
 
   /* Infinite loop */
   for (;;)
@@ -365,14 +362,14 @@ void data_presentation_thread(void *argument)
     }
     else
     {
-      /* Read Data */
-      temperature = stts751_read_temperature(&hi2c1);
-      accX = lsm6dso_read_linear_acc(&hi2c1);
+      /* Read data */
+      float temperature = stts751_read_temperature(&hi2c1);
+      float acceleration = lsm6dso_read_linear_acc(&hi2c1);
 
       /* Print data */
-      int accx_int = (int)(accX * 100);
+      int acc_int = (int)(acceleration * 100);
       int temp_int = (float)(temperature * 100); // Convert to an integer
-      sprintf(buffer, "Temperature: %d.%02d C, AccX: %d.%02d \r\n", temp_int / 100, temp_int % 100, accx_int / 100, accx_int % 100);
+      sprintf(buffer, "Temperature: %d.%02d C, Acc: %d.%02d \r\n", temp_int / 100, temp_int % 100, acc_int / 100, acc_int % 100);
 
       HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
       osDelay(100);

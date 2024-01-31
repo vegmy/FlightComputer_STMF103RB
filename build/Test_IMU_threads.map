@@ -2642,45 +2642,45 @@ LOAD c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode
                 0x080059f8                LSM6DSO_CTRL1XL_DATA
  *fill*         0x080059f9        0x3 
  .rodata.data_presentation_thread.str1.4
-                0x080059fc       0x7c build/main.o
-                                 0x31 (size before relaxing)
+                0x080059fc       0x78 build/main.o
+                                 0x30 (size before relaxing)
  .rodata.str1.4
-                0x08005a78       0x30 build/main.o
+                0x08005a74       0x30 build/main.o
  .rodata.myTask04_attributes
-                0x08005a78       0x24 build/main.o
-                0x08005a78                myTask04_attributes
+                0x08005a74       0x24 build/main.o
+                0x08005a74                myTask04_attributes
  .rodata.GyroRead_attributes
-                0x08005a9c       0x24 build/main.o
-                0x08005a9c                GyroRead_attributes
+                0x08005a98       0x24 build/main.o
+                0x08005a98                GyroRead_attributes
  .rodata.TempRead_attributes
-                0x08005ac0       0x24 build/main.o
-                0x08005ac0                TempRead_attributes
+                0x08005abc       0x24 build/main.o
+                0x08005abc                TempRead_attributes
  .rodata.PresentData_attributes
-                0x08005ae4       0x24 build/main.o
-                0x08005ae4                PresentData_attributes
+                0x08005ae0       0x24 build/main.o
+                0x08005ae0                PresentData_attributes
  .rodata.APBPrescTable
-                0x08005b08        0x8 build/system_stm32f1xx.o
-                0x08005b08                APBPrescTable
+                0x08005b04        0x8 build/system_stm32f1xx.o
+                0x08005b04                APBPrescTable
  .rodata.AHBPrescTable
-                0x08005b10       0x10 build/system_stm32f1xx.o
-                0x08005b10                AHBPrescTable
+                0x08005b0c       0x10 build/system_stm32f1xx.o
+                0x08005b0c                AHBPrescTable
  .rodata.aPredivFactorTable.0
-                0x08005b20        0x2 build/stm32f1xx_hal_rcc.o
- *fill*         0x08005b22        0x2 
+                0x08005b1c        0x2 build/stm32f1xx_hal_rcc.o
+ *fill*         0x08005b1e        0x2 
  .rodata.aPLLMULFactorTable.1
-                0x08005b24       0x10 build/stm32f1xx_hal_rcc.o
+                0x08005b20       0x10 build/stm32f1xx_hal_rcc.o
  .rodata.vTaskStartScheduler.str1.4
-                0x08005b34        0x5 build/tasks.o
+                0x08005b30        0x5 build/tasks.o
  .rodata.prvCheckForValidListAndQueue.str1.4
-                0x08005b34        0x5 build/timers.o
+                0x08005b30        0x5 build/timers.o
  .rodata.xTimerCreateTimerTask.str1.4
-                0x08005b34        0x8 build/timers.o
+                0x08005b30        0x8 build/timers.o
  .rodata._svfprintf_r.str1.1
-                0x08005b34       0x33 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-nano-svfprintf.o)
+                0x08005b30       0x33 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-nano-svfprintf.o)
                                  0x11 (size before relaxing)
  .rodata._printf_i.str1.1
-                0x08005b67       0x22 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-nano-vfprintf_i.o)
- *fill*         0x08005b67        0x1 
+                0x08005b63       0x22 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-nano-vfprintf_i.o)
+ *fill*         0x08005b63        0x5 
  .rodata.tiny   0x08005b68        0x8 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libm.a(libm_a-e_sqrt.o)
  .rodata.one    0x08005b70        0x8 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libm.a(libm_a-e_sqrt.o)
                 0x08005b78                        . = ALIGN (0x4)
@@ -3081,71 +3081,71 @@ LOAD c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode
  .comment       0x00000039       0x3a c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libnosys.a(sbrk.o)
  .comment       0x00000039       0x3a c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp\libc_nano.a(libc_a-errno.o)
 
-.debug_info     0x00000000    0x21207
- .debug_info    0x00000000      0xc90 build/lsm6dso_gyroscope.o
- .debug_info    0x00000c90     0x1a4e build/main.o
- .debug_info    0x000026de      0xd5a build/stm32f1xx_hal_msp.o
- .debug_info    0x00003438      0xa48 build/stm32f1xx_hal_timebase_tim.o
- .debug_info    0x00003e80      0x6c2 build/stm32f1xx_it.o
- .debug_info    0x00004542      0x878 build/stts751_temperature_sensor.o
- .debug_info    0x00004dba      0x22d build/system_stm32f1xx.o
- .debug_info    0x00004fe7      0x7a2 build/stm32f1xx_hal.o
- .debug_info    0x00005789      0xcd9 build/stm32f1xx_hal_cortex.o
- .debug_info    0x00006462      0x604 build/stm32f1xx_hal_gpio.o
- .debug_info    0x00006a66     0x3905 build/stm32f1xx_hal_i2c.o
- .debug_info    0x0000a36b      0x9c7 build/stm32f1xx_hal_rcc.o
- .debug_info    0x0000ad32     0x3be7 build/stm32f1xx_hal_tim.o
- .debug_info    0x0000e919     0x1aac build/stm32f1xx_hal_tim_ex.o
- .debug_info    0x000103c5     0x407d build/stm32f1xx_hal_uart.o
- .debug_info    0x00014442     0x4dee build/cmsis_os2.o
- .debug_info    0x00019230      0x2ba build/list.o
- .debug_info    0x000194ea      0x505 build/port.o
- .debug_info    0x000199ef      0x444 build/heap_4.o
- .debug_info    0x00019e33     0x26cd build/queue.o
- .debug_info    0x0001c500     0x2f13 build/tasks.o
- .debug_info    0x0001f413     0x19e3 build/timers.o
- .debug_info    0x00020df6       0x30 build/startup_stm32f103xb.o
- .debug_info    0x00020e26       0xd3 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_addsubdf3.o)
- .debug_info    0x00020ef9       0x57 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_muldivdf3.o)
- .debug_info    0x00020f50       0xdf c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_cmpdf2.o)
- .debug_info    0x0002102f       0x3c c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_unorddf2.o)
- .debug_info    0x0002106b       0x3f c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_truncdfsf2.o)
- .debug_info    0x000210aa       0xca c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_addsubsf3.o)
- .debug_info    0x00021174       0x57 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_muldivsf3.o)
- .debug_info    0x000211cb       0x3c c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_fixsfsi.o)
+.debug_info     0x00000000    0x211f2
+ .debug_info    0x00000000      0xc7b build/lsm6dso_gyroscope.o
+ .debug_info    0x00000c7b     0x1a4e build/main.o
+ .debug_info    0x000026c9      0xd5a build/stm32f1xx_hal_msp.o
+ .debug_info    0x00003423      0xa48 build/stm32f1xx_hal_timebase_tim.o
+ .debug_info    0x00003e6b      0x6c2 build/stm32f1xx_it.o
+ .debug_info    0x0000452d      0x878 build/stts751_temperature_sensor.o
+ .debug_info    0x00004da5      0x22d build/system_stm32f1xx.o
+ .debug_info    0x00004fd2      0x7a2 build/stm32f1xx_hal.o
+ .debug_info    0x00005774      0xcd9 build/stm32f1xx_hal_cortex.o
+ .debug_info    0x0000644d      0x604 build/stm32f1xx_hal_gpio.o
+ .debug_info    0x00006a51     0x3905 build/stm32f1xx_hal_i2c.o
+ .debug_info    0x0000a356      0x9c7 build/stm32f1xx_hal_rcc.o
+ .debug_info    0x0000ad1d     0x3be7 build/stm32f1xx_hal_tim.o
+ .debug_info    0x0000e904     0x1aac build/stm32f1xx_hal_tim_ex.o
+ .debug_info    0x000103b0     0x407d build/stm32f1xx_hal_uart.o
+ .debug_info    0x0001442d     0x4dee build/cmsis_os2.o
+ .debug_info    0x0001921b      0x2ba build/list.o
+ .debug_info    0x000194d5      0x505 build/port.o
+ .debug_info    0x000199da      0x444 build/heap_4.o
+ .debug_info    0x00019e1e     0x26cd build/queue.o
+ .debug_info    0x0001c4eb     0x2f13 build/tasks.o
+ .debug_info    0x0001f3fe     0x19e3 build/timers.o
+ .debug_info    0x00020de1       0x30 build/startup_stm32f103xb.o
+ .debug_info    0x00020e11       0xd3 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_addsubdf3.o)
+ .debug_info    0x00020ee4       0x57 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_muldivdf3.o)
+ .debug_info    0x00020f3b       0xdf c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_cmpdf2.o)
+ .debug_info    0x0002101a       0x3c c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_unorddf2.o)
+ .debug_info    0x00021056       0x3f c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_truncdfsf2.o)
+ .debug_info    0x00021095       0xca c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_addsubsf3.o)
+ .debug_info    0x0002115f       0x57 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_muldivsf3.o)
+ .debug_info    0x000211b6       0x3c c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_fixsfsi.o)
 
-.debug_abbrev   0x00000000     0x3a95
- .debug_abbrev  0x00000000      0x26e build/lsm6dso_gyroscope.o
- .debug_abbrev  0x0000026e      0x34a build/main.o
- .debug_abbrev  0x000005b8      0x1f2 build/stm32f1xx_hal_msp.o
- .debug_abbrev  0x000007aa      0x231 build/stm32f1xx_hal_timebase_tim.o
- .debug_abbrev  0x000009db      0x1ae build/stm32f1xx_it.o
- .debug_abbrev  0x00000b89      0x1cc build/stts751_temperature_sensor.o
- .debug_abbrev  0x00000d55      0x143 build/system_stm32f1xx.o
- .debug_abbrev  0x00000e98      0x22d build/stm32f1xx_hal.o
- .debug_abbrev  0x000010c5      0x36d build/stm32f1xx_hal_cortex.o
- .debug_abbrev  0x00001432      0x1f7 build/stm32f1xx_hal_gpio.o
- .debug_abbrev  0x00001629      0x2be build/stm32f1xx_hal_i2c.o
- .debug_abbrev  0x000018e7      0x2a0 build/stm32f1xx_hal_rcc.o
- .debug_abbrev  0x00001b87      0x270 build/stm32f1xx_hal_tim.o
- .debug_abbrev  0x00001df7      0x26e build/stm32f1xx_hal_tim_ex.o
- .debug_abbrev  0x00002065      0x31c build/stm32f1xx_hal_uart.o
- .debug_abbrev  0x00002381      0x49f build/cmsis_os2.o
- .debug_abbrev  0x00002820      0x10a build/list.o
- .debug_abbrev  0x0000292a      0x2a4 build/port.o
- .debug_abbrev  0x00002bce      0x24b build/heap_4.o
- .debug_abbrev  0x00002e19      0x40c build/queue.o
- .debug_abbrev  0x00003225      0x393 build/tasks.o
- .debug_abbrev  0x000035b8      0x379 build/timers.o
- .debug_abbrev  0x00003931       0x24 build/startup_stm32f103xb.o
- .debug_abbrev  0x00003955       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_addsubdf3.o)
- .debug_abbrev  0x0000397d       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_muldivdf3.o)
- .debug_abbrev  0x000039a5       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_cmpdf2.o)
- .debug_abbrev  0x000039cd       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_unorddf2.o)
- .debug_abbrev  0x000039f5       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_truncdfsf2.o)
- .debug_abbrev  0x00003a1d       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_addsubsf3.o)
- .debug_abbrev  0x00003a45       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_muldivsf3.o)
- .debug_abbrev  0x00003a6d       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_fixsfsi.o)
+.debug_abbrev   0x00000000     0x3a6c
+ .debug_abbrev  0x00000000      0x245 build/lsm6dso_gyroscope.o
+ .debug_abbrev  0x00000245      0x34a build/main.o
+ .debug_abbrev  0x0000058f      0x1f2 build/stm32f1xx_hal_msp.o
+ .debug_abbrev  0x00000781      0x231 build/stm32f1xx_hal_timebase_tim.o
+ .debug_abbrev  0x000009b2      0x1ae build/stm32f1xx_it.o
+ .debug_abbrev  0x00000b60      0x1cc build/stts751_temperature_sensor.o
+ .debug_abbrev  0x00000d2c      0x143 build/system_stm32f1xx.o
+ .debug_abbrev  0x00000e6f      0x22d build/stm32f1xx_hal.o
+ .debug_abbrev  0x0000109c      0x36d build/stm32f1xx_hal_cortex.o
+ .debug_abbrev  0x00001409      0x1f7 build/stm32f1xx_hal_gpio.o
+ .debug_abbrev  0x00001600      0x2be build/stm32f1xx_hal_i2c.o
+ .debug_abbrev  0x000018be      0x2a0 build/stm32f1xx_hal_rcc.o
+ .debug_abbrev  0x00001b5e      0x270 build/stm32f1xx_hal_tim.o
+ .debug_abbrev  0x00001dce      0x26e build/stm32f1xx_hal_tim_ex.o
+ .debug_abbrev  0x0000203c      0x31c build/stm32f1xx_hal_uart.o
+ .debug_abbrev  0x00002358      0x49f build/cmsis_os2.o
+ .debug_abbrev  0x000027f7      0x10a build/list.o
+ .debug_abbrev  0x00002901      0x2a4 build/port.o
+ .debug_abbrev  0x00002ba5      0x24b build/heap_4.o
+ .debug_abbrev  0x00002df0      0x40c build/queue.o
+ .debug_abbrev  0x000031fc      0x393 build/tasks.o
+ .debug_abbrev  0x0000358f      0x379 build/timers.o
+ .debug_abbrev  0x00003908       0x24 build/startup_stm32f103xb.o
+ .debug_abbrev  0x0000392c       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_addsubdf3.o)
+ .debug_abbrev  0x00003954       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_muldivdf3.o)
+ .debug_abbrev  0x0000397c       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_cmpdf2.o)
+ .debug_abbrev  0x000039a4       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_unorddf2.o)
+ .debug_abbrev  0x000039cc       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_truncdfsf2.o)
+ .debug_abbrev  0x000039f4       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_addsubsf3.o)
+ .debug_abbrev  0x00003a1c       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_muldivsf3.o)
+ .debug_abbrev  0x00003a44       0x28 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_fixsfsi.o)
 
 .debug_loclists
                 0x00000000    0x13000
@@ -3305,42 +3305,42 @@ LOAD c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode
  .debug_rnglists
                 0x000011b6       0x19 build/startup_stm32f103xb.o
 
-.debug_line     0x00000000    0x1c89d
- .debug_line    0x00000000      0x427 build/lsm6dso_gyroscope.o
- .debug_line    0x00000427      0x883 build/main.o
- .debug_line    0x00000caa      0x3da build/stm32f1xx_hal_msp.o
- .debug_line    0x00001084      0x398 build/stm32f1xx_hal_timebase_tim.o
- .debug_line    0x0000141c      0x318 build/stm32f1xx_it.o
- .debug_line    0x00001734      0x2fc build/stts751_temperature_sensor.o
- .debug_line    0x00001a30      0x2cd build/system_stm32f1xx.o
- .debug_line    0x00001cfd      0x5b6 build/stm32f1xx_hal.o
- .debug_line    0x000022b3      0x72f build/stm32f1xx_hal_cortex.o
- .debug_line    0x000029e2      0x658 build/stm32f1xx_hal_gpio.o
- .debug_line    0x0000303a     0x5669 build/stm32f1xx_hal_i2c.o
- .debug_line    0x000086a3      0xd32 build/stm32f1xx_hal_rcc.o
- .debug_line    0x000093d5     0x4684 build/stm32f1xx_hal_tim.o
- .debug_line    0x0000da59     0x1a97 build/stm32f1xx_hal_tim_ex.o
- .debug_line    0x0000f4f0     0x35a3 build/stm32f1xx_hal_uart.o
- .debug_line    0x00012a93     0x31a8 build/cmsis_os2.o
- .debug_line    0x00015c3b      0x3fc build/list.o
- .debug_line    0x00016037      0x632 build/port.o
- .debug_line    0x00016669      0x727 build/heap_4.o
- .debug_line    0x00016d90     0x1e36 build/queue.o
- .debug_line    0x00018bc6     0x27d4 build/tasks.o
- .debug_line    0x0001b39a      0xda1 build/timers.o
- .debug_line    0x0001c13b       0x74 build/startup_stm32f103xb.o
- .debug_line    0x0001c1af      0x16f c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_addsubdf3.o)
- .debug_line    0x0001c31e      0x184 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_muldivdf3.o)
- .debug_line    0x0001c4a2       0xa6 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_cmpdf2.o)
- .debug_line    0x0001c548       0x57 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_unorddf2.o)
- .debug_line    0x0001c59f       0x76 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_truncdfsf2.o)
- .debug_line    0x0001c615      0x103 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_addsubsf3.o)
- .debug_line    0x0001c718      0x123 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_muldivsf3.o)
- .debug_line    0x0001c83b       0x62 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_fixsfsi.o)
+.debug_line     0x00000000    0x1c934
+ .debug_line    0x00000000      0x4be build/lsm6dso_gyroscope.o
+ .debug_line    0x000004be      0x883 build/main.o
+ .debug_line    0x00000d41      0x3da build/stm32f1xx_hal_msp.o
+ .debug_line    0x0000111b      0x398 build/stm32f1xx_hal_timebase_tim.o
+ .debug_line    0x000014b3      0x318 build/stm32f1xx_it.o
+ .debug_line    0x000017cb      0x2fc build/stts751_temperature_sensor.o
+ .debug_line    0x00001ac7      0x2cd build/system_stm32f1xx.o
+ .debug_line    0x00001d94      0x5b6 build/stm32f1xx_hal.o
+ .debug_line    0x0000234a      0x72f build/stm32f1xx_hal_cortex.o
+ .debug_line    0x00002a79      0x658 build/stm32f1xx_hal_gpio.o
+ .debug_line    0x000030d1     0x5669 build/stm32f1xx_hal_i2c.o
+ .debug_line    0x0000873a      0xd32 build/stm32f1xx_hal_rcc.o
+ .debug_line    0x0000946c     0x4684 build/stm32f1xx_hal_tim.o
+ .debug_line    0x0000daf0     0x1a97 build/stm32f1xx_hal_tim_ex.o
+ .debug_line    0x0000f587     0x35a3 build/stm32f1xx_hal_uart.o
+ .debug_line    0x00012b2a     0x31a8 build/cmsis_os2.o
+ .debug_line    0x00015cd2      0x3fc build/list.o
+ .debug_line    0x000160ce      0x632 build/port.o
+ .debug_line    0x00016700      0x727 build/heap_4.o
+ .debug_line    0x00016e27     0x1e36 build/queue.o
+ .debug_line    0x00018c5d     0x27d4 build/tasks.o
+ .debug_line    0x0001b431      0xda1 build/timers.o
+ .debug_line    0x0001c1d2       0x74 build/startup_stm32f103xb.o
+ .debug_line    0x0001c246      0x16f c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_addsubdf3.o)
+ .debug_line    0x0001c3b5      0x184 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_muldivdf3.o)
+ .debug_line    0x0001c539       0xa6 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_cmpdf2.o)
+ .debug_line    0x0001c5df       0x57 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_unorddf2.o)
+ .debug_line    0x0001c636       0x76 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_truncdfsf2.o)
+ .debug_line    0x0001c6ac      0x103 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_addsubsf3.o)
+ .debug_line    0x0001c7af      0x123 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_muldivsf3.o)
+ .debug_line    0x0001c8d2       0x62 c:/Users/vmyhr/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/13.2.1-1.1.1/.content/bin/../lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp\libgcc.a(_arm_fixsfsi.o)
 
 .debug_str      0x00000000     0x77c2
  .debug_str     0x00000000     0x77c2 build/lsm6dso_gyroscope.o
-                                0x92d (size before relaxing)
+                                0x932 (size before relaxing)
  .debug_str     0x000077c2     0x17c5 build/main.o
  .debug_str     0x000077c2      0xc26 build/stm32f1xx_hal_msp.o
  .debug_str     0x000077c2      0xb12 build/stm32f1xx_hal_timebase_tim.o

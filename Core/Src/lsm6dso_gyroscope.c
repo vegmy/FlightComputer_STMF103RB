@@ -1,5 +1,6 @@
 #include "main.h"
 #include "lsm6dso_gyroscope.h"
+#include "math.h"
 
 /* LSM6DSO Registers */
 const uint8_t LSM6DSO_ADD_REG = 0xD6;
@@ -11,8 +12,6 @@ const uint8_t LSM6DSO_OUTY_L_A = 0x2A;
 const uint8_t LSM6DSO_OUTY_H_A = 0x2B;
 const uint8_t LSM6DSO_OUTZ_L_A = 0x2C;
 const uint8_t LSM6DSO_OUTZ_H_A = 0x2D;
-
-
 
 
 /* LSM6DSO control registers */
@@ -52,7 +51,7 @@ float lsm6dso_read_linear_acc(I2C_HandleTypeDef *ptr_i2c1)
     float accX = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A, accX_offset);
     float accY = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTY_H_A, LSM6DSO_OUTY_L_A, accY_offset);
     float accZ = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTZ_H_A, LSM6DSO_OUTZ_L_A, accZ_offset);
-
+    
     float acceleration = sqrt(accX * accX + accY * accY + accZ * accZ);
 
     return acceleration;
