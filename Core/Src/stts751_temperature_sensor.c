@@ -1,5 +1,5 @@
 #include "main.h"
-#include "stts751_temp_sensor.h"
+#include "stts751_temperature_sensor.h"
 
 /* STTS751 Registers */
 const uint8_t STTS751_HIGH_BYTE_REG = 0x00;

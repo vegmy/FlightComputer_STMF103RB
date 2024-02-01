@@ -1,4 +1,4 @@
-build/stts751_temperature_sensor.o: Core/Src/stts751_temperature_sensor.c \
+build/lsm6dso_accelerometer.o: Core/Src/lsm6dso_accelerometer.c \
  Core/Inc/main.h Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  Core/Inc/stm32f1xx_hal_conf.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
@@ -23,7 +23,7 @@ build/stts751_temperature_sensor.o: Core/Src/stts751_temperature_sensor.c \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
- Core/Inc/stts751_temperature_sensor.h
+ Core/Inc/lsm6dso_accelerometer.h
 Core/Inc/main.h:
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 Core/Inc/stm32f1xx_hal_conf.h:
@@ -51,4 +51,4 @@ Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h:
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h:
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h:
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h:
-Core/Inc/stts751_temperature_sensor.h:
+Core/Inc/lsm6dso_accelerometer.h:

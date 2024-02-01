@@ -1,4 +1,4 @@
-build/lsm6dso_gyroscope.o: Core/Src/lsm6dso_gyroscope.c Core/Inc/main.h \
+build/lsm6dso_gyroscope.o: Core/Src/lsm6dso_gyroscope.c \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  Core/Inc/stm32f1xx_hal_conf.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
@@ -24,7 +24,6 @@ build/lsm6dso_gyroscope.o: Core/Src/lsm6dso_gyroscope.c Core/Inc/main.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h \
  Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h \
  Core/Inc/lsm6dso_gyroscope.h
-Core/Inc/main.h:
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h:
 Core/Inc/stm32f1xx_hal_conf.h:
 Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h:
