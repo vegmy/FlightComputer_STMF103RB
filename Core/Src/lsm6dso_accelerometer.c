@@ -14,7 +14,7 @@
 #include "math.h"
 
 /* LSM6DSO Registers */
-const uint8_t LSM6DSO_ADD_REG = 0xD6;
+const uint8_t LSM6DSO_ADD_REG = 0x6B;
 
 /* LSM6DSO acceleration registers */
 const uint8_t LSM6DSO_OUTX_L_A = 0x28;
@@ -65,6 +65,7 @@ float lsm6dso_read_linear_acc(I2C_HandleTypeDef *ptr_i2c1)
     return acceleration;
 }
 
+/* Returns acceleration in one axis in mg's */
 float lsm6dso_read_acc_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t high_byte_reg, uint8_t low_byte_reg, float acc_axis_offset)
 {
     uint8_t high_byte_data = 0;
@@ -77,7 +78,7 @@ float lsm6dso_read_acc_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t high_byte_reg, 
     
     if ( (HAL_OK != read_high_byte) || (HAL_OK != read_low_byte) )
     {
-        return 0;
+        return -999.0f;
     }
     else
     {
@@ -113,8 +114,8 @@ void lsm6dso_calibrate_acc(I2C_HandleTypeDef *ptr_i2c1)
     float accZ_avg = accZ_sum / (float)NUM_SAMPLES;
 
     /* Calculate accelerometer offsets */
-    accX_offset = -accX_avg * LSM6DSO_ACC_SENSITIVITY;
-    accY_offset = -accY_avg * LSM6DSO_ACC_SENSITIVITY;
-    accZ_offset = (1.0f - accZ_avg) * LSM6DSO_ACC_SENSITIVITY;
+    accX_offset = accX_avg * LSM6DSO_ACC_SENSITIVITY;
+    accY_offset = accY_avg * LSM6DSO_ACC_SENSITIVITY;
+    accZ_offset = (accZ_avg - 1000) * LSM6DSO_ACC_SENSITIVITY;
 }
 

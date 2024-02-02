@@ -353,7 +353,7 @@ static void MX_GPIO_Init(void)
 void data_presentation_thread(void *argument)
 {
   /* USER CODE BEGIN 5 */
-  char buffer[32];
+  char buffer[34];
   HAL_StatusTypeDef lsm6dso_accelerometer_ok  = lsm6dso_acc_init(&hi2c1);
   HAL_StatusTypeDef lsm6dso_gyroscope_ok      = lsm6dso_gyroscope_init(&hi2c1);
 
