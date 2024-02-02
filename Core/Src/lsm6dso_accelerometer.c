@@ -30,7 +30,7 @@ const uint8_t LSM6DSO_CTRL6_C = 0x15;
 
 /* LSM6DSO data */
 uint8_t LSM6DSO_CTRL1XL_DATA = 0x44;
-const float LSM6DSO_ACC_SENSITIVITY = 0.122f;
+const float LSM6DSO_ACC_SENSITIVITY = 0.061f;
 
 /* Calibration data */
 float accX_offset = 0.0f;
@@ -82,8 +82,7 @@ float lsm6dso_read_acc_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t high_byte_reg, 
     else
     {
         int16_t combined_data = (high_byte_data << 8) | low_byte_data;
-
-        float acceleration = ((float)combined_data * LSM6DSO_ACC_SENSITIVITY) + acc_axis_offset;
+        float acceleration = (((float)combined_data * LSM6DSO_ACC_SENSITIVITY) + acc_axis_offset); // 
         return acceleration;
     }
 }

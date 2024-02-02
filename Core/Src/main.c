@@ -355,7 +355,7 @@ void data_presentation_thread(void *argument)
   /* USER CODE BEGIN 5 */
   char buffer[32];
   HAL_StatusTypeDef lsm6dso_accelerometer_ok  = lsm6dso_acc_init(&hi2c1);
-  HAL_StatusTypeDef lsm6dso_gyroscope_ok = lsm6dso_gyroscope_init(&hi2c1);
+  HAL_StatusTypeDef lsm6dso_gyroscope_ok      = lsm6dso_gyroscope_init(&hi2c1);
 
   /* Infinite loop */
   for (;;)
@@ -381,7 +381,7 @@ void data_presentation_thread(void *argument)
       /* Print data */
       int acc_int  = (int)(acceleration * 100);
       int temp_int = (float)(temperature * 100);
-      sprintf(buffer, "Temperature: %d.%02d C \n, Acceleration: %d.%02d \r\n", temp_int / 100, temp_int % 100, acc_int / 100, acc_int % 100);
+      sprintf(buffer, "Temperature: %d.%02d C, Acceleration: %d.%02d \r\n", temp_int / 100, temp_int % 100, acc_int / 100, acc_int % 100);
 
       HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
       osDelay(100);
