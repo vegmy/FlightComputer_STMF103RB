@@ -353,7 +353,9 @@ static void MX_GPIO_Init(void)
 void data_presentation_thread(void *argument)
 {
   /* USER CODE BEGIN 5 */
-  char buffer[34];
+  char buffer[64];
+  float acceleration_vector[3];
+  float rotation_vector[3];
   HAL_StatusTypeDef lsm6dso_accelerometer_ok  = lsm6dso_acc_init(&hi2c1);
   HAL_StatusTypeDef lsm6dso_gyroscope_ok      = lsm6dso_gyroscope_init(&hi2c1);
 
@@ -362,26 +364,41 @@ void data_presentation_thread(void *argument)
   {
     if (HAL_OK != lsm6dso_accelerometer_ok)
     {
-      sprintf(buffer, "%d\r\n", lsm6dso_accelerometer_ok);
+      sprintf(buffer, "LSM6DSO accelerometer HAL status code: %d\r\n", lsm6dso_accelerometer_ok);
       HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
       osDelay(1000);
     }
     if (HAL_OK != lsm6dso_gyroscope_ok)
     {
-      sprintf(buffer, "%d\r\n", lsm6dso_gyroscope_ok);
+      sprintf(buffer, "LSM6DSO gyroscope HAL status code: %d\r\n", lsm6dso_gyroscope_ok);
       HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
       osDelay(1000);
     }
+
     else
     {
       /* Read data */
-      float temperature  = stts751_read_temperature(&hi2c1);
-      float acceleration = lsm6dso_read_linear_acc(&hi2c1);
-
+      float temperature = stts751_read_temperature(&hi2c1);
+      lsm6dso_read_acc_vector(&hi2c1, acceleration_vector); 
+      lsm6dso_read_rot_vector(&hi2c1, rotation_vector);
+      
       /* Print data */
-      int acc_int  = (int)(acceleration * 100);
-      int temp_int = (float)(temperature * 100);
-      sprintf(buffer, "Temperature: %d.%02d C, Acceleration: %d.%02d \r\n", temp_int / 100, temp_int % 100, acc_int / 100, acc_int % 100);
+      int temp_int = (int)(temperature * 100);
+      int accX_int = (int)(acceleration_vector[0] * 100);
+      int accY_int = (int)(acceleration_vector[1] * 100);
+      int accZ_int = (int)(acceleration_vector[2] * 100);
+      int gyroX_int = (int)(rotation_vector[0] * 100);
+      int gyroY_int = (int)(rotation_vector[1] * 100);
+      int gyroZ_int = (int)(rotation_vector[2] * 100);
+
+      sprintf(buffer, "Temperature: %d.%02d C, AccX: %d.%02d g, AccY: %d.%02d g, AccZ: %d.%02d g, GyroX: %d.%02d dps, GyroY: %d.%02d dps, GyroZ: %d.%02d dps\r\n",
+              temp_int / 100, temp_int % 100, 
+              accX_int / 100, accX_int % 100, 
+              accY_int / 100, accY_int % 100, 
+              accZ_int / 100, accZ_int % 100,
+              gyroX_int / 100, gyroX_int % 100, 
+              gyroY_int / 100, gyroY_int % 100, 
+              gyroZ_int / 100, gyroZ_int % 100);
 
       HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
       osDelay(100);

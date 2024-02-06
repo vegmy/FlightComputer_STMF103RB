@@ -14,7 +14,7 @@
 #include "math.h"
 
 /* LSM6DSO Registers */
-const uint8_t LSM6DSO_ADD_REG = 0x6B;
+const uint8_t LSM6DSO_ADD_REG = 0xD6;
 
 /* LSM6DSO acceleration registers */
 const uint8_t LSM6DSO_OUTX_L_A = 0x28;
@@ -30,13 +30,14 @@ const uint8_t LSM6DSO_CTRL6_C = 0x15;
 
 /* LSM6DSO data */
 uint8_t LSM6DSO_CTRL1XL_DATA = 0x44;
-const float LSM6DSO_ACC_SENSITIVITY = 0.061f;
+const float LSM6DSO_ACC_SENSITIVITY = 0.000488f; //LSB/G 
 
 /* Calibration data */
 float accX_offset = 0.0f;
 float accY_offset = 0.0f;
 float accZ_offset = 0.0f;
 
+/* Initialise LSM6DSO accelerometer */
 HAL_StatusTypeDef lsm6dso_acc_init(I2C_HandleTypeDef *ptr_i2c1)
 {
     /* Set accelerometer to 2g full scale range and 104 Hz output data rate */
@@ -52,40 +53,6 @@ HAL_StatusTypeDef lsm6dso_acc_init(I2C_HandleTypeDef *ptr_i2c1)
     lsm6dso_calibrate_acc(ptr_i2c1);
 
     return write_mem_ok;
-}
-
-float lsm6dso_read_linear_acc(I2C_HandleTypeDef *ptr_i2c1)
-{
-    float accX = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A, accX_offset);
-    float accY = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTY_H_A, LSM6DSO_OUTY_L_A, accY_offset);
-    float accZ = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTZ_H_A, LSM6DSO_OUTZ_L_A, accZ_offset);
-    
-    float acceleration = sqrt(accX * accX + accY * accY + accZ * accZ);
-
-    return acceleration;
-}
-
-/* Returns acceleration in one axis in mg's */
-float lsm6dso_read_acc_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t high_byte_reg, uint8_t low_byte_reg, float acc_axis_offset)
-{
-    uint8_t high_byte_data = 0;
-    uint8_t low_byte_data = 0;
-
-    HAL_StatusTypeDef read_high_byte = HAL_I2C_Mem_Read(ptr_i2c1, LSM6DSO_ADD_REG, high_byte_reg,
-                     I2C_MEMADD_SIZE_8BIT, &high_byte_data, 1, HAL_MAX_DELAY);
-    HAL_StatusTypeDef read_low_byte = HAL_I2C_Mem_Read(ptr_i2c1, LSM6DSO_ADD_REG, low_byte_reg,
-                     I2C_MEMADD_SIZE_8BIT, &low_byte_data, 1, HAL_MAX_DELAY);
-    
-    if ( (HAL_OK != read_high_byte) || (HAL_OK != read_low_byte) )
-    {
-        return -999.0f;
-    }
-    else
-    {
-        int16_t combined_data = (high_byte_data << 8) | low_byte_data;
-        float acceleration = (((float)combined_data * LSM6DSO_ACC_SENSITIVITY) + acc_axis_offset); // 
-        return acceleration;
-    }
 }
 
 void lsm6dso_calibrate_acc(I2C_HandleTypeDef *ptr_i2c1)
@@ -116,6 +83,39 @@ void lsm6dso_calibrate_acc(I2C_HandleTypeDef *ptr_i2c1)
     /* Calculate accelerometer offsets */
     accX_offset = accX_avg * LSM6DSO_ACC_SENSITIVITY;
     accY_offset = accY_avg * LSM6DSO_ACC_SENSITIVITY;
-    accZ_offset = (accZ_avg - 1000) * LSM6DSO_ACC_SENSITIVITY;
+    accZ_offset = accZ_avg * LSM6DSO_ACC_SENSITIVITY;
 }
+
+/* Returns acceleration vector */
+void lsm6dso_read_acc_vector(I2C_HandleTypeDef *ptr_i2c1, float *acceleration_vector)
+{
+    acceleration_vector[0] = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A, accX_offset);
+    acceleration_vector[1] = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTY_H_A, LSM6DSO_OUTY_L_A, accY_offset);
+    acceleration_vector[2] = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTZ_H_A, LSM6DSO_OUTZ_L_A, accZ_offset);
+}
+
+/* Returns acceleration in one axis in mg's */
+float lsm6dso_read_acc_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t high_byte_reg, uint8_t low_byte_reg, float acc_axis_offset)
+{
+    uint8_t high_byte_data = 0;
+    uint8_t low_byte_data = 0;
+
+    HAL_StatusTypeDef read_high_byte = HAL_I2C_Mem_Read(ptr_i2c1, LSM6DSO_ADD_REG, high_byte_reg,
+                     I2C_MEMADD_SIZE_8BIT, &high_byte_data, 1, HAL_MAX_DELAY);
+    HAL_StatusTypeDef read_low_byte = HAL_I2C_Mem_Read(ptr_i2c1, LSM6DSO_ADD_REG, low_byte_reg,
+                     I2C_MEMADD_SIZE_8BIT, &low_byte_data, 1, HAL_MAX_DELAY);
+    
+    if ( (HAL_OK != read_high_byte) || (HAL_OK != read_low_byte) )
+    {
+        return -999.0f;
+    }
+    else
+    {
+        int16_t combined_data = (high_byte_data << 8) | low_byte_data;
+        float acceleration = (((float)combined_data * LSM6DSO_ACC_SENSITIVITY) + acc_axis_offset);
+        return acceleration;
+    }
+}
+
+
 
