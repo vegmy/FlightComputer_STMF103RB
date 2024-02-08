@@ -355,7 +355,7 @@ void data_presentation_thread(void *argument)
 {
   /* USER CODE BEGIN 5 */
   char buffer[64];
-  float imu_vector[6];
+  float imu_vector[6]    = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
   uint8_t lsm6dso_imu_ok = lsm6dso_imu_init(&hi2c1);
 
   /* Infinite loop */
@@ -375,13 +375,13 @@ void data_presentation_thread(void *argument)
       lsm6dso_read_imu(&hi2c1, imu_vector); 
       
       /* Print data */
-      int temp_int = (int)(temperature * 100);
+      int temp_int  = (int)(temperature * 100);
       int gyroX_int = (int)(imu_vector[0] * 100);
       int gyroY_int = (int)(imu_vector[1] * 100);
       int gyroZ_int = (int)(imu_vector[2] * 100);
-      int accX_int = (int)(imu_vector[0] * 100);
-      int accY_int = (int)(imu_vector[1] * 100);
-      int accZ_int = (int)(imu_vector[2] * 100);
+      int accX_int  = (int)(imu_vector[3] * 100);
+      int accY_int  = (int)(imu_vector[4] * 100);
+      int accZ_int  = (int)(imu_vector[5] * 100);
 
       sprintf(buffer, "Temperature: %d.%02d C, AccX: %d.%02d g, AccY: %d.%02d g, AccZ: %d.%02d g, GyroX: %d.%02d dps, GyroY: %d.%02d dps, GyroZ: %d.%02d dps\r\n",
               temp_int / 100, temp_int % 100, 

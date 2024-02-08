@@ -49,8 +49,8 @@ const float LSM6DSO_ACC_SENSITIVITY  = 0.000488f; //LSB/G
 const float LSM6DSO_GYRO_SENSITIVITY = 0.07f;
 
 /* LSM6DSO IMU offsets */
-float vec_acc_offset[3];
-float vec_gyro_offset[3];
+float vec_acc_offset[3]  = {0.0f, 0.0f, 0.0f};
+float vec_gyro_offset[3] = {0.0f, 0.0f, 0.0f};
 
 /* Writes to LSM6DSO registers */
 uint8_t lsm6dso_imu_init(I2C_TypeDef *ptr_i2c1)
@@ -104,19 +104,15 @@ void lsm6dso_calibrate(I2C_TypeDef *ptr_i2c1, uint8_t read_start_register, float
 */
 void lsm6dso_read_imu(I2C_TypeDef *ptr_i2c1, float *vec_imu)
 {
-    float vec_acc[3]; // Acceleration vector
-    float vec_rot[3]; // Rotation speed vector
+    /* IMU Rotation speed values */
+    vec_imu[0] = lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTX_L_G, vec_gyro_offset[0]) * LSM6DSO_GYRO_SENSITIVITY;
+    vec_imu[1] = lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTY_L_G, vec_gyro_offset[1]) * LSM6DSO_GYRO_SENSITIVITY;
+    vec_imu[2] = lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTZ_L_G, vec_gyro_offset[2]) * LSM6DSO_GYRO_SENSITIVITY;
     
-    lsm6dso_read_vector(ptr_i2c1, LSM6DSO_OUTX_L_G, vec_gyro_offset, vec_rot);
-    lsm6dso_read_vector(ptr_i2c1, LSM6DSO_OUTX_L_A, vec_acc_offset, vec_acc);
-
-    vec_imu[0] = vec_rot[0] * LSM6DSO_GYRO_SENSITIVITY;
-    vec_imu[1] = vec_rot[1] * LSM6DSO_GYRO_SENSITIVITY;
-    vec_imu[2] = vec_rot[2] * LSM6DSO_GYRO_SENSITIVITY;
-
-    vec_imu[3] = vec_acc[0] * LSM6DSO_ACC_SENSITIVITY;
-    vec_imu[4] = vec_acc[1] * LSM6DSO_ACC_SENSITIVITY;
-    vec_imu[5] = vec_acc[2] * LSM6DSO_ACC_SENSITIVITY;
+    /* IMU Acceleration values */
+    vec_imu[3] = lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTX_L_A, vec_acc_offset[0]) * LSM6DSO_ACC_SENSITIVITY;
+    vec_imu[4] = lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTY_L_A, vec_acc_offset[1]) * LSM6DSO_ACC_SENSITIVITY;
+    vec_imu[5] = lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTZ_L_A, vec_acc_offset[2]) * LSM6DSO_ACC_SENSITIVITY;
 }
 
 void lsm6dso_read_vector(I2C_HandleTypeDef *ptr_i2c1, uint8_t read_start_register, float *offset_vector, float *return_vector)
@@ -146,7 +142,7 @@ float lsm6dso_read_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t read_start_register
      raw_data_combined = (int16_t) ((vec_axis_raw[1] << 8) | vec_axis_raw[0]);   
     }
 
-    float return_data = ((float) raw_data_combined);
+    float return_data = ((float) raw_data_combined) - offset_axis;
 
     return return_data;
 }
