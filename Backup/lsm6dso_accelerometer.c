@@ -24,21 +24,24 @@ const uint8_t LSM6DSO_OUTY_H_A = 0x2B;
 const uint8_t LSM6DSO_OUTZ_L_A = 0x2C;
 const uint8_t LSM6DSO_OUTZ_H_A = 0x2D;
 
-
 /* LSM6DSO control registers */
 const uint8_t LSM6DSO_CTRL1_XL = 0x10;
 const uint8_t LSM6DSO_CTRL6_C = 0x15;
 
 /* LSM6DSO data */
-const uint8_t LSM6DSO_CTRL1XL_DATA = 0x44;
-const float LSM6DSO_ACC_SENSITIVITY = 0.122f;
+uint8_t LSM6DSO_CTRL1XL_DATA = 0x44;
+const float LSM6DSO_ACC_SENSITIVITY = 0.000488f; //LSB/G 
+uint8_t LSM6DSO_ACC_RAW_DATA[6];
 
 /* Calibration data */
+float vec_acc_offset[3];
+
 float accX_offset = 0.0f;
 float accY_offset = 0.0f;
 float accZ_offset = 0.0f;
 
-HAL_StatusTypeDef lsm6dso_init(I2C_HandleTypeDef *ptr_i2c1)
+/* Initialise LSM6DSO accelerometer */
+HAL_StatusTypeDef lsm6dso_acc_init(I2C_HandleTypeDef *ptr_i2c1)
 {
     /* Set accelerometer to 2g full scale range and 104 Hz output data rate */
     HAL_StatusTypeDef write_mem_ok = HAL_I2C_Mem_Write(ptr_i2c1, LSM6DSO_ADD_REG, LSM6DSO_CTRL1_XL,
@@ -55,17 +58,58 @@ HAL_StatusTypeDef lsm6dso_init(I2C_HandleTypeDef *ptr_i2c1)
     return write_mem_ok;
 }
 
-float lsm6dso_read_linear_acc(I2C_HandleTypeDef *ptr_i2c1)
+/* Calibrates accelerometer */
+void lsm6dso_calibrate_acc(I2C_HandleTypeDef *ptr_i2c1)
 {
-    float accX = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A, accX_offset);
-    float accY = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTY_H_A, LSM6DSO_OUTY_L_A, accY_offset);
-    float accZ = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTZ_H_A, LSM6DSO_OUTZ_L_A, accZ_offset);
-    
-    float acceleration = sqrt(accX * accX + accY * accY + accZ * accZ);
+    /* Read and average 100 samples of accelerometer data */
+    const uint8_t NUM_SAMPLES = 100;
+    uint8_t vec_raw_data[6];
+    float accX_sum = 0.0f;
+    float accY_sum = 0.0f;
+    float accZ_sum = 0.0f;
 
-    return acceleration;
+    for (uint8_t sample = 0; sample < NUM_SAMPLES; sample++)
+    {
+        HAL_StatusTypeDef read_i2c_status = HAL_I2C_Mem_Read(ptr_i2c1, LSM6DSO_ADD_REG, LSM6DSO_OUTX_L_A, I2C_MEMADD_SIZE_8BIT, vec_raw_data, 6, HAL_MAX_DELAY);
+
+        if (HAL_OK == read_i2c_status)
+        {
+
+        accX_sum += (float) ((int16_t) (vec_raw_data[1] << 8) | vec_raw_data[0]);
+        accY_sum += (float) ((int16_t) (vec_raw_data[3] << 8) | vec_raw_data[2]);
+        accZ_sum += (float) ((int16_t) (vec_raw_data[5] << 8) | vec_raw_data[4]);
+
+        HAL_Delay(10);
+        }
+        
+    }
+
+    /* Calculate accelerometer offsets */
+    accX_offset = accX_sum / (float)NUM_SAMPLES;
+    accY_offset = accY_sum / (float)NUM_SAMPLES;
+    accZ_offset = accZ_sum / (float)NUM_SAMPLES;
 }
 
+/* Returns acceleration vector */
+void lsm6dso_read_acc_vector(I2C_HandleTypeDef *ptr_i2c1, float *acceleration_vector)
+{
+    HAL_StatusTypeDef read_memory_ok = HAL_I2C_Mem_Read(ptr_i2c1, LSM6DSO_ADD_REG, LSM6DSO_OUTX_L_A, I2C_MEMADD_SIZE_8BIT, LSM6DSO_ACC_RAW_DATA, 6, HAL_MAX_DELAY);
+    if (HAL_OK != read_memory_ok)
+    {
+        acceleration_vector[0] = -999.0f;
+        acceleration_vector[1] = -999.0f;
+        acceleration_vector[2] = -999.0f;
+    }
+    else
+    {
+        /* This should be split up into variables to improve readability */
+        acceleration_vector[0] = ((float)((int16_t)((LSM6DSO_ACC_RAW_DATA[1] << 8) | LSM6DSO_ACC_RAW_DATA[0])) - vec_acc_offset[0]) * LSM6DSO_ACC_SENSITIVITY;
+        acceleration_vector[1] = ((float)((int16_t)((LSM6DSO_ACC_RAW_DATA[3] << 8) | LSM6DSO_ACC_RAW_DATA[2])) - vec_acc_offset[1]) * LSM6DSO_ACC_SENSITIVITY;
+        acceleration_vector[2] = ((float)((int16_t)((LSM6DSO_ACC_RAW_DATA[5] << 8) | LSM6DSO_ACC_RAW_DATA[4])) - vec_acc_offset[2]) * LSM6DSO_ACC_SENSITIVITY;
+    }
+}
+
+/* Returns acceleration in one axis in mg's */
 float lsm6dso_read_acc_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t high_byte_reg, uint8_t low_byte_reg, float acc_axis_offset)
 {
     uint8_t high_byte_data = 0;
@@ -78,45 +122,15 @@ float lsm6dso_read_acc_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t high_byte_reg, 
     
     if ( (HAL_OK != read_high_byte) || (HAL_OK != read_low_byte) )
     {
-        return 0;
+        return -999.0f;
     }
     else
     {
         int16_t combined_data = (high_byte_data << 8) | low_byte_data;
-
-        float acceleration = ((float)combined_data * LSM6DSO_ACC_SENSITIVITY) + acc_axis_offset;
+        float acceleration = (((float)combined_data * LSM6DSO_ACC_SENSITIVITY) - acc_axis_offset);
         return acceleration;
     }
 }
 
-void lsm6dso_calibrate_acc(I2C_HandleTypeDef *ptr_i2c1)
-{
-    /* Read and average 100 samples of accelerometer data */
-    const uint8_t NUM_SAMPLES = 100;
-    float accX_sum = 0.0f;
-    float accY_sum = 0.0f;
-    float accZ_sum = 0.0f;
 
-    for (uint8_t i = 0; i < NUM_SAMPLES; i++)
-    {
-        float accX_raw = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTX_H_A, LSM6DSO_OUTX_L_A, accX_offset);
-        float accY_raw = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTY_H_A, LSM6DSO_OUTY_L_A, accY_offset);
-        float accZ_raw = lsm6dso_read_acc_axis(ptr_i2c1, LSM6DSO_OUTZ_H_A, LSM6DSO_OUTZ_L_A, accZ_offset);
-
-        accX_sum += accX_raw;
-        accY_sum += accY_raw;
-        accZ_sum += accZ_raw;
-
-        HAL_Delay(10);
-    }
-
-    float accX_avg = accX_sum / (float)NUM_SAMPLES;
-    float accY_avg = accY_sum / (float)NUM_SAMPLES;
-    float accZ_avg = accZ_sum / (float)NUM_SAMPLES;
-
-    /* Calculate accelerometer offsets */
-    accX_offset = -accX_avg * LSM6DSO_ACC_SENSITIVITY;
-    accY_offset = -accY_avg * LSM6DSO_ACC_SENSITIVITY;
-    accZ_offset = (1.0f - accZ_avg) * LSM6DSO_ACC_SENSITIVITY;
-}
 
