@@ -37,8 +37,6 @@ const uint8_t LSM6DSO_CTRL2_G_DATA   = 0x4C;
 const float LSM6DSO_GYRO_SENSITIVITY = 0.07f;
 float gyro_offset[3];
 uint8_t LSM6DSO_GYRO_RAW_DATA[6];
-uint8_t LSM6DSO_CTRL1XL_DATA = 0x44;
-const float LSM6DSO_ACC_SENSITIVITY = 0.000488f; //LSB/G 
 
  /* Initialise gyoroscope, write to control register *
  * 

@@ -37,7 +37,8 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 Core/Src/freertos.c \
-Core/Src/lsm6dso_imu.c \
+Core/Src/lsm6dso_accelerometer.c \
+Core/Src/lsm6dso_gyroscope.c \
 Core/Src/main.c \
 Core/Src/stm32f1xx_hal_msp.c \
 Core/Src/stm32f1xx_hal_timebase_tim.c \

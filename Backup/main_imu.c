@@ -29,8 +29,9 @@
 #include "string.h"
 #include "stdio.h"
 #include "stts751_temperature_sensor.h"
-#include "lsm6dso_accelerometer.h"
-#include "lsm6dso_gyroscope.h"
+// #include "lsm6dso_accelerometer.h"
+// #include "lsm6dso_gyroscope.h"
+#include "lsm6dso_imu.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -354,41 +355,33 @@ void data_presentation_thread(void *argument)
 {
   /* USER CODE BEGIN 5 */
   char buffer[64];
-  float vec_acc[3] = {0.0f, 0.0f, 0.0f};
-  float vec_rot_speed[3] = {0.0f, 0.0f,0.0f};
-  HAL_StatusTypeDef accelerometer_status = lsm6dso_acc_init(&hi2c1);
-  HAL_StatusTypeDef gyroscope_status = lsm6dso_gyroscope_init(&hi2c1);
+  float imu_vector[6]    = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+  uint8_t lsm6dso_imu_ok = lsm6dso_imu_init(&hi2c1);
 
   /* Infinite loop */
   for (;;)
   {
-    if (HAL_OK != accelerometer_status)
+    if (1 != lsm6dso_imu_ok)
     {
-      sprintf(buffer, "Accelerometer initialise error!");
+      sprintf(buffer, "LSM6DSO init error!");
       HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
       osDelay(1000);
     }
-    if (HAL_OK != gyroscope_status)
-    {
-      sprintf(buffer, "Gyroscope initialise error!");
-      HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
-      osDelay(1000);
-    }
+
     else
     {
       /* Read data */
       float temperature = stts751_read_temperature(&hi2c1);
-      lsm6dso_read_acc_vector(&hi2c1, vec_acc);
-      lsm6dso_read_rot_vector(&hi2c1, vec_rot_speed);
-
-      /* Print data to COM3 */
+      lsm6dso_read_imu(&hi2c1, imu_vector); 
+      
+      /* Print data */
       int temp_int  = (int)(temperature * 100);
-      int gyroX_int = (int)(vec_rot_speed[0] * 100);
-      int gyroY_int = (int)(vec_rot_speed[1] * 100);
-      int gyroZ_int = (int)(vec_rot_speed[2] * 100);
-      int accX_int  = (int)(vec_acc[3] * 100);
-      int accY_int  = (int)(vec_acc[4] * 100);
-      int accZ_int  = (int)(vec_acc[5] * 100);
+      int gyroX_int = (int)(imu_vector[0] * 100);
+      int gyroY_int = (int)(imu_vector[1] * 100);
+      int gyroZ_int = (int)(imu_vector[2] * 100);
+      int accX_int  = (int)(imu_vector[3] * 100);
+      int accY_int  = (int)(imu_vector[4] * 100);
+      int accZ_int  = (int)(imu_vector[5] * 100);
 
       sprintf(buffer, "Temperature: %d.%02d C, AccX: %d.%02d g, AccY: %d.%02d g, AccZ: %d.%02d g, GyroX: %d.%02d dps, GyroY: %d.%02d dps, GyroZ: %d.%02d dps\r\n",
               temp_int / 100, temp_int % 100, 

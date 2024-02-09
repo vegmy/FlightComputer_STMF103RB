@@ -10,7 +10,7 @@
  */
 
 #include "stm32f1xx_hal.h"
-#include "lsm6dso_imu.h"
+// #include "lsm6dso_imu.h"
 #include "math.h"
 
 /* LSM6DSO Address Register */
