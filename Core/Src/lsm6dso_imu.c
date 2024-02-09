@@ -110,9 +110,9 @@ void lsm6dso_read_imu(I2C_TypeDef *ptr_i2c1, float *vec_imu)
     vec_imu[2] = lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTZ_L_G, vec_gyro_offset[2]) * LSM6DSO_GYRO_SENSITIVITY;
     
     /* IMU Acceleration values */
-    vec_imu[3] = lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTX_L_A, vec_acc_offset[0]) * LSM6DSO_ACC_SENSITIVITY;
-    vec_imu[4] = lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTY_L_A, vec_acc_offset[1]) * LSM6DSO_ACC_SENSITIVITY;
-    vec_imu[5] = lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTZ_L_A, vec_acc_offset[2]) * LSM6DSO_ACC_SENSITIVITY;
+    vec_imu[3] = (lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTX_L_A, vec_acc_offset[0]) - vec_acc_offset[0] ) * LSM6DSO_ACC_SENSITIVITY;
+    vec_imu[4] = (lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTY_L_A, vec_acc_offset[1]) - vec_acc_offset[1] ) * LSM6DSO_ACC_SENSITIVITY;
+    vec_imu[5] = (lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTZ_L_A, vec_acc_offset[2]) - vec_acc_offset[2] ) * LSM6DSO_ACC_SENSITIVITY;
 }
 
 void lsm6dso_read_vector(I2C_HandleTypeDef *ptr_i2c1, uint8_t read_start_register, float *offset_vector, float *return_vector)
@@ -142,7 +142,7 @@ float lsm6dso_read_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t read_start_register
      raw_data_combined = (int16_t) ((vec_axis_raw[1] << 8) | vec_axis_raw[0]);   
     }
 
-    float return_data = ((float) raw_data_combined) - offset_axis;
+    float return_data = ((float) raw_data_combined);
 
     return return_data;
 }
