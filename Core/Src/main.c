@@ -22,16 +22,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
 #include "math.h"
 #include "stdint.h"
 #include "stdlib.h"
 #include "string.h"
 #include "stdio.h"
 #include "stts751_temperature_sensor.h"
-// #include "lsm6dso_accelerometer.h"
-// #include "lsm6dso_gyroscope.h"
 #include "lsm6dso_imu.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -52,37 +50,48 @@
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
 
-UART_HandleTypeDef huart2;
-
-/* Definitions for PresentData */
-osThreadId_t PresentDataHandle;
-const osThreadAttr_t PresentData_attributes = {
-  .name = "PresentData",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityHigh,
+/* Definitions for DataPresent */
+osThreadId_t DataPresentHandle;
+const osThreadAttr_t DataPresent_attributes = {
+  .name = "DataPresent",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for TempRead */
-osThreadId_t TempReadHandle;
-const osThreadAttr_t TempRead_attributes = {
-  .name = "TempRead",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityBelowNormal,
-};
-/* Definitions for GyroRead */
-osThreadId_t GyroReadHandle;
-const osThreadAttr_t GyroRead_attributes = {
-  .name = "GyroRead",
+/* Definitions for DataCollection */
+osThreadId_t DataCollectionHandle;
+const osThreadAttr_t DataCollection_attributes = {
+  .name = "DataCollection",
   .stack_size = 128 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
-/* Definitions for myTask04 */
-osThreadId_t myTask04Handle;
-const osThreadAttr_t myTask04_attributes = {
-  .name = "myTask04",
+/* Definitions for DataProcessing */
+osThreadId_t DataProcessingHandle;
+const osThreadAttr_t DataProcessing_attributes = {
+  .name = "DataProcessing",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
+
+/* Flight computer RTOS shared recourses */
+float temperature = 0.0f;
+float imu_vector[6] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+uint8_t lsm6dso_imu_ok = 0;
+UART_HandleTypeDef huart2;
+int temp_int  = 0;
+int gyroX_int = 0;
+int gyroY_int = 0;
+int gyroZ_int = 0;
+int accX_int  = 0;
+int accY_int  = 0;
+int accZ_int  = 0;
+int acceleration_int =0;
+int speed_int = 0;
+
+float prev_acceleration = 0.0f;
+float acceleration = 0.0f;
+float prev_speed   = 0.0f;
+float speed        = 0.0f;
 
 /* USER CODE END PV */
 
@@ -92,9 +101,8 @@ static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART2_UART_Init(void);
 void data_presentation_thread(void *argument);
-void read_temperature_thread(void *argument);
-void read_gyrodata_thread(void *argument);
-void StartTask04(void *argument);
+void data_collection_thread(void *argument);
+void data_processing_thread(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -121,7 +129,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -135,8 +142,12 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */
 
+  /* USER CODE BEGIN 2 */
+  char resetbuffer[64];
+  HAL_UART_Transmit(&huart2, (uint8_t *)resetbuffer, strlen(resetbuffer), 50);
+  sprintf(resetbuffer, "Reset\n");
+  lsm6dso_imu_ok = lsm6dso_imu_init(&hi2c1);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -159,17 +170,14 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of PresentData */
-  PresentDataHandle = osThreadNew(data_presentation_thread, NULL, &PresentData_attributes);
+  /* creation of DataPresent */
+  DataPresentHandle = osThreadNew(data_presentation_thread, NULL, &DataPresent_attributes);
 
-  /* creation of TempRead */
-  TempReadHandle = osThreadNew(read_temperature_thread, NULL, &TempRead_attributes);
+  /* creation of DataCollection */
+  DataCollectionHandle = osThreadNew(data_collection_thread, NULL, &DataCollection_attributes);
 
-  /* creation of GyroRead */
-  GyroReadHandle = osThreadNew(read_gyrodata_thread, NULL, &GyroRead_attributes);
-
-  /* creation of myTask04 */
-  myTask04Handle = osThreadNew(StartTask04, NULL, &myTask04_attributes);
+  /* creation of DataProcessing */
+  DataProcessingHandle = osThreadNew(data_processing_thread, NULL, &DataProcessing_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -342,11 +350,12 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_data_presentation_thread */
 /**
- * @brief  Function implementing the PresentData thread.
+ * @brief  This thread presents the data to the user by printing to COM.
  * @param  argument: Not used
  * @retval None
  */
@@ -354,103 +363,97 @@ static void MX_GPIO_Init(void)
 void data_presentation_thread(void *argument)
 {
   /* USER CODE BEGIN 5 */
-  char buffer[64];
-  float imu_vector[6]    = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-  uint8_t lsm6dso_imu_ok = lsm6dso_imu_init(&hi2c1);
-
+  char buffer[176];
   /* Infinite loop */
   for (;;)
   {
     if (1 != lsm6dso_imu_ok)
     {
       sprintf(buffer, "LSM6DSO init error!");
-      HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), HAL_MAX_DELAY);
+      HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
       osDelay(1000);
     }
-
     else
     {
-      /* Read data */
-      float temperature = stts751_read_temperature(&hi2c1);
-      lsm6dso_read_imu(&hi2c1, imu_vector); 
-      
-      /* Print data */
-      int temp_int  = (int)(temperature * 100);
-      int gyroX_int = (int)(imu_vector[0] * 100);
-      int gyroY_int = (int)(imu_vector[1] * 100);
-      int gyroZ_int = (int)(imu_vector[2] * 100);
-      int accX_int  = (int)(imu_vector[3] * 100);
-      int accY_int  = (int)(imu_vector[4] * 100);
-      int accZ_int  = (int)(imu_vector[5] * 100);
+      /* Print data to COM */
+sprintf(buffer, "Temperature: %d.%02d C, AccX: %d.%02d g, AccY: %d.%02d g, AccZ: %d.%02d g, GyroX: %d.%02d dps, GyroY: %d.%02d dps, GyroZ: %d.%02d dps, Acc: %d.%02d m/s^2, Speed: %d.%02d m/s\r\n",
+        temp_int / 100, temp_int % 100,
+        accX_int / 100, accX_int % 100,
+        accY_int / 100, accY_int % 100,
+        accZ_int / 100, accZ_int % 100,
+        gyroX_int / 100, gyroX_int % 100,
+        gyroY_int / 100, gyroY_int % 100,
+        gyroZ_int / 100, gyroZ_int % 100,
+        acceleration_int / 100, acceleration_int % 100, // Assuming acceleration is already in m/s^2
+        speed_int / 100, speed_int % 100 ); // Assuming speed is calculated correctly in m/s
 
-      sprintf(buffer, "Temperature: %d.%02d C, AccX: %d.%02d g, AccY: %d.%02d g, AccZ: %d.%02d g, GyroX: %d.%02d dps, GyroY: %d.%02d dps, GyroZ: %d.%02d dps\r\n",
-              temp_int / 100, temp_int % 100, 
-              accX_int / 100, accX_int % 100, 
-              accY_int / 100, accY_int % 100, 
-              accZ_int / 100, accZ_int % 100,
-              gyroX_int / 100, gyroX_int % 100, 
-              gyroY_int / 100, gyroY_int % 100, 
-              gyroZ_int / 100, gyroZ_int % 100);
-
-      HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
-      osDelay(100);
+HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
+osDelay(100);
     }
   }
   /* USER CODE END 5 */
 }
 
-/* USER CODE BEGIN Header_read_temperature_thread */
+/* USER CODE BEGIN Header_data_collection_thread */
 /**
- * @brief Function implementing the TempRead thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_read_temperature_thread */
-void read_temperature_thread(void *argument)
+* @brief Function implementing the DataCollection thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_data_collection_thread */
+void data_collection_thread(void *argument)
 {
-  /* USER CODE BEGIN read_temperature_thread */
+  /* USER CODE BEGIN data_collection_thread */
+  char buffer[64];
+  uint16_t collection_counter = 0;
   /* Infinite loop */
-  for (;;)
+for (;;)
   {
-    osDelay(1);
+    stts751_read_temperature(&hi2c1, &temperature);
+    lsm6dso_read_imu(&hi2c1, imu_vector);
+    osDelay(100);
   }
-  /* USER CODE END read_temperature_thread */
+  /* USER CODE END data_collection_thread */
 }
-
-/* USER CODE BEGIN Header_read_gyrodata_thread */
+/* USER CODE BEGIN Header_data_processing_thread */
 /**
- * @brief Function implementing the GyroRead thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_read_gyrodata_thread */
-void read_gyrodata_thread(void *argument)
+* @brief Function implementing the DataProcessing thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_data_processing_thread */
+void data_processing_thread(void *argument)
 {
-  /* USER CODE BEGIN read_gyrodata_thread */
+  /* USER CODE BEGIN data_processing_thread */
+  char buffer[32];
+  uint32_t lastTick = 0;
+  uint32_t currentTick;
+  float deltaTime;
   /* Infinite loop */
-  for (;;)
+  for(;;)
   {
-    osDelay(1);
-  }
-  /* USER CODE END read_gyrodata_thread */
-}
+    prev_acceleration = acceleration;
+    temp_int  = (int)(temperature * 100);
+    gyroX_int = (int)(imu_vector[0] * 100);
+    gyroY_int = (int)(imu_vector[1] * 100);
+    gyroZ_int = (int)(imu_vector[2] * 100);
+    accX_int  = (int)(imu_vector[3] * 100);
+    accY_int  = (int)(imu_vector[4] * 100);
+    accZ_int  = (int)(imu_vector[5] * 100);
+    acceleration_int = (int)acceleration;
+    speed_int = (int)speed;
 
-/* USER CODE BEGIN Header_StartTask04 */
-/**
- * @brief Function implementing the myTask04 thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_StartTask04 */
-void StartTask04(void *argument)
-{
-  /* USER CODE BEGIN StartTask04 */
-  /* Infinite loop */
-  for (;;)
-  {
-    osDelay(1);
+    acceleration = sqrtf((imu_vector[5] * imu_vector[5]) + (imu_vector[4] * imu_vector[4]) + (imu_vector[3] + imu_vector[3])) * 9.81f;
+
+    currentTick = HAL_GetTick(); // For STM32 HAL, gets the tick since the program started
+    deltaTime = (currentTick - lastTick) / 1000.0f; // Convert milliseconds to seconds
+    lastTick = currentTick; // Update lastTick for the next measurement
+
+    speed = (acceleration - prev_acceleration) / deltaTime;
+    
+    osDelay(100);
   }
-  /* USER CODE END StartTask04 */
+  /* USER CODE END data_processing_thread */
 }
 
 /**
@@ -505,3 +508,20 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
+
+/* SCHEDULER TESTING 
+   PRINT TO COM
+
+  /* USER CODE BEGIN
+  char buffer[32];
+  uint16_t processing_counter = 0;
+  /* Infinite loop 
+  for(;;)
+  {
+    sprintf(buffer, "3. Processing: %d \n", processing_counter);
+    HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
+    processing_counter++;
+    osDelay(1000);
+  }
+*/

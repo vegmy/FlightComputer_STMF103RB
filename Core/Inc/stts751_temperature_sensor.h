@@ -7,8 +7,7 @@
 
 /* Funtion to initialize the sensor STTS751*/
 int stts751_init(I2C_HandleTypeDef *ptr_i2c1);
-
 /* Function to read temperature from STTS751 registers */
-float stts751_read_temperature();
+void stts751_read_temperature(I2C_HandleTypeDef *ptr_i2c1, float *temperature);
 
 #endif
