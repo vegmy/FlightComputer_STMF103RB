@@ -29,7 +29,8 @@
 #include "stdio.h"
 #include "stts751_temperature_sensor.h"
 #include "lsm6dso_imu.h"
-
+#include "math_filter.h"
+#include "math_lib.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -86,13 +87,28 @@ int accX_int  = 0;
 int accY_int  = 0;
 int accZ_int  = 0;
 int acceleration_int =0;
-int speed_int = 0;
 
-float prev_acceleration = 0.0f;
+int speed_int  = 0;
+int int_angleX = 0;
+int int_angleY = 0;
+int int_angleZ = 0;
+
 float acceleration = 0.0f;
 float prev_speed   = 0.0f;
 float speed        = 0.0f;
+float angleX       = 0.0f;
+float angleY       = 0.0f;
+float angleZ       = 0.0f;
 
+/* Filtered data */
+float iir_acceleraion = 0.0f;
+
+float iir_gyroX = 0.0f;
+float iir_gyroY = 0.0f;
+float iir_gyroZ = 0.0f;
+float iir_accX  = 0.0f;
+float iir_accY  = 0.0f;
+float iir_accZ  = 0.0f;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -142,7 +158,7 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_USART2_UART_Init();
-
+  
   /* USER CODE BEGIN 2 */
   char resetbuffer[64];
   HAL_UART_Transmit(&huart2, (uint8_t *)resetbuffer, strlen(resetbuffer), 50);
@@ -376,19 +392,24 @@ void data_presentation_thread(void *argument)
     else
     {
       /* Print data to COM */
-sprintf(buffer, "Temperature: %d.%02d C, AccX: %d.%02d g, AccY: %d.%02d g, AccZ: %d.%02d g, GyroX: %d.%02d dps, GyroY: %d.%02d dps, GyroZ: %d.%02d dps, Acc: %d.%02d m/s^2, Speed: %d.%02d m/s\r\n",
-        temp_int / 100, temp_int % 100,
-        accX_int / 100, accX_int % 100,
-        accY_int / 100, accY_int % 100,
-        accZ_int / 100, accZ_int % 100,
-        gyroX_int / 100, gyroX_int % 100,
-        gyroY_int / 100, gyroY_int % 100,
-        gyroZ_int / 100, gyroZ_int % 100,
-        acceleration_int / 100, acceleration_int % 100, // Assuming acceleration is already in m/s^2
-        speed_int / 100, speed_int % 100 ); // Assuming speed is calculated correctly in m/s
+      sprintf(buffer, 
+          "AccX: %d.%02d g, AccY: %d.%02d g, AccZ: %d.%02d g, "
+          "GyroX: %d.%02d [rad/s], GyroY: %d.%02d [rad/s], GyroZ: %d.%02d [rad/s], "
+          "Gyro_angleX: %d.%02d rad, Gyro_angleY: %d.%02d rad, Gyro_angleZ: %d.%02d rad\r\n",
+          accX_int  / 100, accX_int % 100,
+          accY_int  / 100, accY_int % 100,
+          accZ_int  / 100, accZ_int % 100,
 
-HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
-osDelay(100);
+          gyroX_int / 100, gyroX_int % 100,
+          gyroY_int / 100, gyroY_int % 100,
+          gyroZ_int / 100, gyroZ_int % 100,
+
+          int_angleX / 100, int_angleX % 100,
+          int_angleY / 100, int_angleY % 100,
+          int_angleZ / 100, int_angleZ % 100);
+
+      HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
+      osDelay(100);
     }
   }
   /* USER CODE END 5 */
@@ -404,14 +425,12 @@ osDelay(100);
 void data_collection_thread(void *argument)
 {
   /* USER CODE BEGIN data_collection_thread */
-  char buffer[64];
-  uint16_t collection_counter = 0;
   /* Infinite loop */
 for (;;)
   {
     stts751_read_temperature(&hi2c1, &temperature);
     lsm6dso_read_imu(&hi2c1, imu_vector);
-    osDelay(100);
+    osDelay(10);
   }
   /* USER CODE END data_collection_thread */
 }
@@ -432,24 +451,41 @@ void data_processing_thread(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    prev_acceleration = acceleration;
-    temp_int  = (int)(temperature * 100);
-    gyroX_int = (int)(imu_vector[0] * 100);
-    gyroY_int = (int)(imu_vector[1] * 100);
-    gyroZ_int = (int)(imu_vector[2] * 100);
+    // acceleration    = sqrtf((imu_vector[5] * imu_vector[5]) + (imu_vector[4] * imu_vector[4]) + (imu_vector[3] * imu_vector[3]));
+    // iir_acceleraion = IIR_filter(acceleration, iir_acceleraion, 0.5f);
+    
+    iir_gyroX = IIR_filter(imu_vector[0], iir_gyroX, 0.5f);
+    iir_gyroY = IIR_filter(imu_vector[1], iir_gyroY, 0.5f);
+    iir_gyroZ = IIR_filter(imu_vector[2], iir_gyroZ, 0.5f);
+
+    // temp_int  = (int)(temperature   * 100);
+
+    /*Gyroscope */
+    gyroX_int = (int)(dps_to_rps(iir_gyroX) * 100);
+    gyroY_int = (int)(dps_to_rps(iir_gyroY) * 100);
+    gyroZ_int = (int)(dps_to_rps(iir_gyroZ) * 100);
+
+    /* Accelerometer */
     accX_int  = (int)(imu_vector[3] * 100);
     accY_int  = (int)(imu_vector[4] * 100);
     accZ_int  = (int)(imu_vector[5] * 100);
-    acceleration_int = (int)acceleration;
-    speed_int = (int)speed;
 
-    acceleration = sqrtf((imu_vector[5] * imu_vector[5]) + (imu_vector[4] * imu_vector[4]) + (imu_vector[3] + imu_vector[3])) * 9.81f;
+    int_angleX = (int)(angleX * 100);
+    int_angleY = (int)(angleY * 100);
+    int_angleZ = (int)(angleZ * 100);
 
-    currentTick = HAL_GetTick(); // For STM32 HAL, gets the tick since the program started
-    deltaTime = (currentTick - lastTick) / 1000.0f; // Convert milliseconds to seconds
-    lastTick = currentTick; // Update lastTick for the next measurement
+    acceleration_int = (int)(iir_acceleraion * 100);
+    speed_int        = (int)(speed * 100);
 
-    speed = (acceleration - prev_acceleration) / deltaTime;
+    currentTick = HAL_GetTick(); 
+    deltaTime   = (currentTick - lastTick) / 1000.0f; // Convert milliseconds to seconds
+    lastTick    = currentTick; 
+
+    angleX += dps_to_rps(iir_gyroX) * deltaTime;
+    angleY += dps_to_rps(iir_gyroY) * deltaTime;
+    angleZ += dps_to_rps(iir_gyroZ) * deltaTime;
+
+    // speed       =  acceleration * deltaTime;
     
     osDelay(100);
   }

@@ -46,10 +46,11 @@ const uint8_t LSM6DSO_OUTZ_H_A = 0x2D;
  */
 const uint8_t LSM6DSO_CTRL1XL_DATA   = 0x44;
 const uint8_t LSM6DSO_CTRL2_G_DATA   = 0x4C;
-const float LSM6DSO_ACC_SENSITIVITY  = 0.000488f; //LSB/G 
-const float LSM6DSO_GYRO_SENSITIVITY = 0.07f;
+const float LSM6DSO_ACC_SENSITIVITY  = 0.000488f; // [LSB/g]
+const float LSM6DSO_GYRO_SENSITIVITY = 0.07f;     // [LSB/g]
 
 /* LSM6DSO IMU offsets */
+const uint8_t NUM_SAMPLES = 100;
 float vec_acc_offset[3]  = {0.0f, 0.0f, 0.0f};
 float vec_gyro_offset[3] = {0.0f, 0.0f, 0.0f};
 
@@ -81,11 +82,12 @@ uint8_t lsm6dso_imu_init(I2C_HandleTypeDef *ptr_i2c1)
         lsm6dso_status = 0;
     }
 
-    lsm6dso_calibrate_sensor(ptr_i2c1, LSM6DSO_OUTX_L_A, vec_acc_offset);
-    lsm6dso_calibrate_sensor(ptr_i2c1, LSM6DSO_OUTX_L_G, vec_gyro_offset);
+    lsm6dso_calibrate_sensor(ptr_i2c1, LSM6DSO_OUTX_L_A, vec_acc_offset, NUM_SAMPLES);
+    lsm6dso_calibrate_sensor(ptr_i2c1, LSM6DSO_OUTX_L_G, vec_gyro_offset, NUM_SAMPLES);
 
     return lsm6dso_status;
 }
+
 
 /**
  * @brief Calibrates a sensor of the IMU LSM6DSO.
@@ -94,9 +96,9 @@ uint8_t lsm6dso_imu_init(I2C_HandleTypeDef *ptr_i2c1)
  * @param read_start_register Start register for the sensor to calibrate, this will read memory from the I2C bus of size 6.
  * @param vec_offset Vector to put the offset into, needs to be of size 3.
  */
-void lsm6dso_calibrate_sensor(I2C_HandleTypeDef *ptr_i2c1, uint8_t read_start_register, float *vec_offset)
+void lsm6dso_calibrate_sensor(I2C_HandleTypeDef *ptr_i2c1, uint8_t read_start_register, float *vec_offset, const uint8_t NUM_SAMPLES)
 {
-    const uint8_t NUM_SAMPLES = 100;
+    // const uint8_t NUM_SAMPLES = 100;
     float vec_sample_sum[3] = {0.0f, 0.0f, 0.0f};
     uint8_t vec_raw_data[6];
 
@@ -137,7 +139,7 @@ void lsm6dso_read_imu(I2C_HandleTypeDef *ptr_i2c1, float *vec_imu)
     /* IMU Acceleration values */
     vec_imu[3] = (lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTX_L_A, vec_acc_offset[0])  ) * LSM6DSO_ACC_SENSITIVITY;
     vec_imu[4] = (lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTY_L_A, vec_acc_offset[1])  ) * LSM6DSO_ACC_SENSITIVITY;
-    vec_imu[5] = ((lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTZ_L_A, vec_acc_offset[2]) ) * LSM6DSO_ACC_SENSITIVITY) + 1.0f;
+    vec_imu[5] = (lsm6dso_read_axis(ptr_i2c1, LSM6DSO_OUTZ_L_A, vec_acc_offset[2]) ) * LSM6DSO_ACC_SENSITIVITY;
 }
 
 /**
@@ -148,16 +150,16 @@ void lsm6dso_read_imu(I2C_HandleTypeDef *ptr_i2c1, float *vec_imu)
  * @param offset_vector The offset vector for the sensor.
  * @param vec_imu Vector to put the IMU values into. This needs to be of size 3.
  */
-void lsm6dso_read_vector(I2C_HandleTypeDef *ptr_i2c1, uint8_t read_start_register, float *offset_vector, float *vec_imu)
-{
-    const uint8_t NUM_AXIS = 3;
+// void lsm6dso_read_vector(I2C_HandleTypeDef *ptr_i2c1, uint8_t read_start_register, float *offset_vector, float *vec_imu)
+// {
+//     const uint8_t NUM_AXIS = 3;
 
-    for(int axis = 0; axis <= NUM_AXIS; axis++)
-    {
-        vec_imu[axis] = lsm6dso_read_axis(ptr_i2c1, read_start_register, offset_vector[axis]);
-        read_start_register += 2;
-    }
-}
+//     for(int axis = 0; axis <= NUM_AXIS; axis++)
+//     {
+//         vec_imu[axis] = lsm6dso_read_axis(ptr_i2c1, read_start_register, offset_vector[axis]);
+//         read_start_register += 2;
+//     }
+// }
 
 /**
  * @brief Reads 1 axis from a sensor the LSM6DSO IMU and returns it as a float value.
@@ -192,4 +194,9 @@ float lsm6dso_read_axis(I2C_HandleTypeDef *ptr_i2c1, uint8_t read_start_register
     float return_data = ((float) raw_data_combined) - offset_axis;
 
     return return_data;
+}
+
+void lsm6dso_update_acc_offset(I2C_HandleTypeDef *ptr_i2c1)
+{
+    lsm6dso_calibrate_sensor(ptr_i2c1, LSM6DSO_OUTX_L_A, vec_acc_offset, 10);
 }
