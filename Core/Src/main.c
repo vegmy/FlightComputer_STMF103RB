@@ -31,6 +31,9 @@
 #include "lsm6dso_imu.h"
 #include "math_filter.h"
 #include "math_lib.h"
+#include "quaternion.h"
+#include "sensor_fusion.h"
+#include "vector.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -69,7 +72,7 @@ const osThreadAttr_t DataCollection_attributes = {
 osThreadId_t DataProcessingHandle;
 const osThreadAttr_t DataProcessing_attributes = {
   .name = "DataProcessing",
-  .stack_size = 128 * 4,
+  .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
@@ -87,6 +90,16 @@ int accX_int  = 0;
 int accY_int  = 0;
 int accZ_int  = 0;
 int acceleration_int =0;
+
+quaternion_t quat_orientation  = {1.0f, 0.0f, 0.0f, 0.0f}; // orientation q(n-1) global orientasjon fra forrige ts.
+quaternion_t quat_dq_gyro      = {1.0f, 0.0f, 0.0f, 0.0f}; // dq fra gyroskop, utregnet fra nåværende rotasjon.
+quaternion_t quat_gyro_orient  = {1.0f, 0.0f, 0.0f, 0.0f}; // 
+
+quaternion_t quat_acceleration = {1.0f, 0.0f, 0.0f, 0.0f}; // 
+
+vector_t vec_orientation       = {1.0f, 0.0f, 0.0f};
+vector_t vec_angular_speed     = {0.0f, 0.0f, 0.0f};
+vector_t vec_norm_acc_angle    = {0.0f, 0.0f, 0.0f};
 
 int speed_int  = 0;
 int int_angleX = 0;
@@ -395,7 +408,7 @@ void data_presentation_thread(void *argument)
       sprintf(buffer, 
           "AccX: %d.%02d g, AccY: %d.%02d g, AccZ: %d.%02d g, "
           "GyroX: %d.%02d [rad/s], GyroY: %d.%02d [rad/s], GyroZ: %d.%02d [rad/s], "
-          "Gyro_angleX: %d.%02d rad, Gyro_angleY: %d.%02d rad, Gyro_angleZ: %d.%02d rad\r\n",
+          "Orientation_X: %d.%02d rad, Orientation_Y: %d.%02d rad, Orientation_Z: %d.%02d rad\r\n",
           accX_int  / 100, accX_int % 100,
           accY_int  / 100, accY_int % 100,
           accZ_int  / 100, accZ_int % 100,
@@ -445,48 +458,68 @@ void data_processing_thread(void *argument)
 {
   /* USER CODE BEGIN data_processing_thread */
   char buffer[32];
-  uint32_t lastTick = 0;
-  uint32_t currentTick;
-  float deltaTime;
+  uint32_t last_tick = 0;
+  uint32_t current_tick;
+  float delta_time;
   /* Infinite loop */
   for(;;)
   {
-    // acceleration    = sqrtf((imu_vector[5] * imu_vector[5]) + (imu_vector[4] * imu_vector[4]) + (imu_vector[3] * imu_vector[3]));
-    // iir_acceleraion = IIR_filter(acceleration, iir_acceleraion, 0.5f);
+    /* Get delta time */
+    current_tick = HAL_GetTick(); 
+    delta_time  = (current_tick - last_tick) / 1000.0f; // Convert milliseconds to seconds
+    last_tick    = current_tick; 
     
+    /* Filter gyro measurements */
     iir_gyroX = IIR_filter(imu_vector[0], iir_gyroX, 0.5f);
     iir_gyroY = IIR_filter(imu_vector[1], iir_gyroY, 0.5f);
     iir_gyroZ = IIR_filter(imu_vector[2], iir_gyroZ, 0.5f);
 
-    // temp_int  = (int)(temperature   * 100);
-
-    /*Gyroscope */
-    gyroX_int = (int)(dps_to_rps(iir_gyroX) * 100);
-    gyroY_int = (int)(dps_to_rps(iir_gyroY) * 100);
-    gyroZ_int = (int)(dps_to_rps(iir_gyroZ) * 100);
-
     /* Accelerometer */
     accX_int  = (int)(imu_vector[3] * 100);
     accY_int  = (int)(imu_vector[4] * 100);
-    accZ_int  = (int)(imu_vector[5] * 100);
+    accZ_int  = (int)((imu_vector[5] + 1) * 100);
 
-    int_angleX = (int)(angleX * 100);
-    int_angleY = (int)(angleY * 100);
-    int_angleZ = (int)(angleZ * 100);
+    /*Konverterer gyro measuremens to rps */
+    angleX = dps_to_rps(iir_gyroX);
+    angleY = dps_to_rps(iir_gyroY);
+    angleZ = dps_to_rps(iir_gyroZ);
 
-    acceleration_int = (int)(iir_acceleraion * 100);
-    speed_int        = (int)(speed * 100);
+    /* Gyro to print */
+    gyroX_int = (int)(angleX * 100);
+    gyroY_int = (int)(angleY * 100);
+    gyroZ_int = (int)(angleZ * 100);
 
-    currentTick = HAL_GetTick(); 
-    deltaTime   = (currentTick - lastTick) / 1000.0f; // Convert milliseconds to seconds
-    lastTick    = currentTick; 
+    /* put anular speed in a vector
+       and calculate orientation quaternion 
+       based on gyro measurements     */
+    vec_angular_speed.x = iir_gyroX;
+    vec_angular_speed.y = iir_gyroY;
+    vec_angular_speed.z = iir_gyroZ;
 
-    angleX += dps_to_rps(iir_gyroX) * deltaTime;
-    angleY += dps_to_rps(iir_gyroY) * deltaTime;
-    angleZ += dps_to_rps(iir_gyroZ) * deltaTime;
+    quaternion_from_gyroscope(&quat_dq_gyro, &vec_angular_speed, delta_time); //beregnet rotasjon fra gyroskop dq_gyro
+    quat_gyro_orient = multiply_quaternions(quat_dq_gyro, quat_orientation); // gyro orientasjon er produktet av dq_gyro og global orientasjon.
 
-    // speed       =  acceleration * deltaTime;
+   
+        /* Calculate orientation quaternion based on 
+       accelerometer measurements */
+
+    vec_norm_acc_angle.x = imu_vector[3];
+    vec_norm_acc_angle.y = imu_vector[4];
+    vec_norm_acc_angle.z = imu_vector[5]; 
     
+    // normalize_vector(&vec_norm_acc_angle);
+
+    // orientation_from_accelerometer(&vec_norm_acc_angle, &quat_acceleration);
+
+
+    vec_orientation = rotate_vector_by_quaternion(vec_orientation, quat_gyro_orient);
+
+    int_angleX = (int)(vec_orientation.x * 100);
+    int_angleY = (int)(vec_orientation.y * 100);
+    int_angleZ = (int)(vec_orientation.z * 100);
+
+
+
     osDelay(100);
   }
   /* USER CODE END data_processing_thread */

@@ -84,7 +84,7 @@ uint8_t lsm6dso_imu_init(I2C_HandleTypeDef *ptr_i2c1)
 
     lsm6dso_calibrate_sensor(ptr_i2c1, LSM6DSO_OUTX_L_A, vec_acc_offset, NUM_SAMPLES);
     lsm6dso_calibrate_sensor(ptr_i2c1, LSM6DSO_OUTX_L_G, vec_gyro_offset, NUM_SAMPLES);
-
+    
     return lsm6dso_status;
 }
 
