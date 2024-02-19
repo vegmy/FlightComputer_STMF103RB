@@ -1,5 +1,5 @@
 #include "main.h"
-#include "stts751_temperature_sensor.h"
+#include "stts751_temp_sensor.h"
 
 /* STTS751 Registers */
 const uint8_t STTS751_HIGH_BYTE_REG = 0x00;
@@ -38,14 +38,14 @@ int stts751_init(I2C_HandleTypeDef *ptr_i2c1)
     return write_memory_ok;
 }
 
-void stts751_read_temperature(I2C_HandleTypeDef *ptr_i2c1, float *temperature)
+float stts751_read_temperature(I2C_HandleTypeDef *ptr_i2c1)
 {
     uint8_t temperature_high;
     uint8_t temperature_low;
     int16_t temperature_combined;
     HAL_StatusTypeDef read_high_byte_status;
     HAL_StatusTypeDef read_low_byte_status;
-    // float temperature = 0.0f;
+    float temperature = 0.0f;
 
     read_high_byte_status = HAL_I2C_Mem_Read(ptr_i2c1, STTS751_ADDR_REG, STTS751_HIGH_BYTE_REG,
                             STTS751_REG_SIZE, &temperature_high, STTS751_DATA_SIZE, HAL_MAX_DELAY);
@@ -55,7 +55,7 @@ void stts751_read_temperature(I2C_HandleTypeDef *ptr_i2c1, float *temperature)
 
     if (read_high_byte_status || read_high_byte_status != HAL_OK)
     {
-        *temperature = -999.0f; /* Error value */
+        temperature = -999.0f; /* Error value */
     }
     else
     {  
@@ -63,12 +63,12 @@ void stts751_read_temperature(I2C_HandleTypeDef *ptr_i2c1, float *temperature)
         temperature_combined |= temperature_low;
         temperature_combined >>= 4;
 
-        /* If the temperature is a negative value */
-        if (temperature_combined & 0x800) 
-        { 
-            temperature_combined |= 0xF000;
+        if (temperature_combined & 0x800) { /* If the temperature is negative */
+        temperature_combined |= 0xF000;
         }
         
-        *temperature = (float)temperature_combined * 0.0625f; // Convert to temperature with 0.0625 resolution
+        temperature = (float)temperature_combined * 0.0625f; // Convert to temperature with 0.0625 resolution
     }
+
+    return temperature;
 }

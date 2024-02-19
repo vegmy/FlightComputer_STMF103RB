@@ -37,13 +37,18 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 Core/Src/freertos.c \
-Core/Src/lsm6dso_gyroscope.c \
+Core/Src/lsm6dso_imu.c \
 Core/Src/main.c \
+Core/Src/math_filter.c \
+Core/Src/math_lib.c \
+Core/Src/quaternion.c \
+Core/Src/sensor_fusion.c \
 Core/Src/stm32f1xx_hal_msp.c \
 Core/Src/stm32f1xx_hal_timebase_tim.c \
 Core/Src/stm32f1xx_it.c \
 Core/Src/stts751_temperature_sensor.c \
 Core/Src/system_stm32f1xx.c \
+Core/Src/vector.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c \
 Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c \

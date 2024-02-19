@@ -3,7 +3,9 @@
     "cortex-debug.openocdPath": "C:\\USERS\\VMYHR\\APPDATA\\ROAMING\\CODE\\USER\\GLOBALSTORAGE\\BMD.STM32-FOR-VSCODE\\@XPACK-DEV-TOOLS\\OPENOCD\\0.12.0-2.1\\.CONTENT\\BIN\\OPENOCD.EXE",
     "files.associations": {
         "stts751_temp_sensor": "c",
-        "stts751_temp_sensor.h": "c"
+        "stts751_temp_sensor.h": "c",
+        "stts751_temperature_sensor.h": "c",
+        "lsm6dso_gyroscope.h": "c"
     },
     "stm32-for-vscode.openOCDPath": "C:\\USERS\\VMYHR\\APPDATA\\ROAMING\\CODE\\USER\\GLOBALSTORAGE\\BMD.STM32-FOR-VSCODE\\@XPACK-DEV-TOOLS\\OPENOCD\\0.12.0-2.1\\.CONTENT\\BIN\\OPENOCD.EXE",
     "stm32-for-vscode.makePath": "C:\\USERS\\VMYHR\\APPDATA\\ROAMING\\CODE\\USER\\GLOBALSTORAGE\\BMD.STM32-FOR-VSCODE\\@XPACK-DEV-TOOLS\\WINDOWS-BUILD-TOOLS\\4.4.1-2.1\\.CONTENT\\BIN\\MAKE.EXE",
