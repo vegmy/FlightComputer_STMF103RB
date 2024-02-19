@@ -22,5 +22,8 @@ void update_orientation(vector_t *vec_angular_speed, quaternion_t *quat_orientat
 vector_t rotate_vector_by_quaternion(vector_t vec_current_orientation, quaternion_t quat_rotation);
 void orientation_from_accelerometer(vector_t *vec_acc, quaternion_t *quat_acc);
 void quaternion_from_gyroscope(quaternion_t *quat_out, vector_t *rot_axis, float delta_time);
+void rotate_orientation_quaternion(quaternion_t* quat_out, quaternion_t *quat_rot, quaternion_t *quat_in);
+void quaternion_from_acceleration(quaternion_t *q, const vector_t *a);
+
 
 #endif

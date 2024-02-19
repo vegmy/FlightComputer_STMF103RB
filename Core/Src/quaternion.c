@@ -137,28 +137,28 @@ vector_t rotate_vector_by_quaternion(vector_t vec_current_orientation, quaternio
     return vec_current_orientation;
 }
 
-void orientation_from_accelerometer(vector_t *vec_acc, quaternion_t *quat_acc)
+void quaternion_from_acceleration(quaternion_t *q, const vector_t *a)
 {
-    normalize_vector(vec_acc);
+    vector_t up = {0.0f, 0.0f, 1.0f}; // Målvektor
+    vector_t norm_a = *a;
+    normalize_vector(&norm_a); // Normaliser akselerasjonsvektoren
 
-    // Rotasjonsaksen er kryssproduktet av akselerasjonsvektoren og z-aksen (0, 0, 1)
-    vector_t rot_axis = {vec_acc->y, -vec_acc->x, 0.0f};
-    normalize_vector(&rot_axis);
+    vector_t axis = cross_product(&norm_a, &up); // Beregn rotasjonsaksen
+    float angle = acosf(dot_product(&norm_a, &up)); // Beregn vinkelen
 
-    // Finn vinkelen mellom akselerasjonsvektoren og z-aksen
-    float dot = vec_acc->z; // Ettersom a er normalisert, er dette dot-produktet av a og (0, 0, 1)
-    float angle = acos(dot); // acos gir vinkelen i radianer
+    // Normaliser rotasjonsaksen
+    normalize_vector(&axis);
 
-    // Bruker halve vinkelen for kvaternion
-    float sin_half_angle = sin(angle / 2.0f);
-
-    // Opprett kvaternionen med halve vinkelen
-    quat_acc->w = cos(angle / 2.0f);
-    quat_acc->x = rot_axis.x * sin_half_angle;
-    quat_acc->y = rot_axis.y * sin_half_angle;
-    quat_acc->z = rot_axis.z * sin_half_angle;
-
-    // Normalisere kvaternionen
-    normalize_quaternion(quat_acc);
+    // Konverter vinkel og akse til kvaternion
+    q->w = cosf(angle / 2.0f);
+    q->x = axis.x * sinf(angle / 2.0f);
+    q->y = axis.y * sinf(angle / 2.0f);
+    q->z = axis.z * sinf(angle / 2.0f);
 }
 
+void rotate_orientation_quaternion(quaternion_t* quat_out, quaternion_t *quat_rot, quaternion_t *quat_in) {
+
+	quaternion_t quat_inverse_rot = inverse_quaternion(*quat_rot);
+	// Utfør kvaternionmultiplikasjonen v_out = rot * v_in * rot^-1
+    *quat_out = multiply_quaternions(multiply_quaternions(*quat_rot, *quat_in), quat_inverse_rot);
+}

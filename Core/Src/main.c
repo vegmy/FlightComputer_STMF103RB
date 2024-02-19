@@ -54,6 +54,8 @@
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
 
+UART_HandleTypeDef huart2;
+
 /* Definitions for DataPresent */
 osThreadId_t DataPresentHandle;
 const osThreadAttr_t DataPresent_attributes = {
@@ -74,6 +76,11 @@ const osThreadAttr_t DataProcessing_attributes = {
   .name = "DataProcessing",
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for sharedResourcesMutex */
+osMutexId_t sharedResourcesMutexHandle;
+const osMutexAttr_t sharedResourcesMutex_attributes = {
+  .name = "sharedResourcesMutex"
 };
 /* USER CODE BEGIN PV */
 
@@ -96,8 +103,10 @@ quaternion_t quat_dq_gyro      = {1.0f, 0.0f, 0.0f, 0.0f}; // dq fra gyroskop, u
 quaternion_t quat_gyro_orient  = {1.0f, 0.0f, 0.0f, 0.0f}; // 
 
 quaternion_t quat_acceleration = {1.0f, 0.0f, 0.0f, 0.0f}; // 
+quaternion_t quat_acc_vector   = {1.0f, 0.0f, 0.0f, 0.0f};
+quaternion_t quat_acc_rotation = {1.0f, 0.0f, 0.0f, 0.0f};
 
-vector_t vec_orientation       = {1.0f, 0.0f, 0.0f};
+vector_t vec_orientation       = {0.0f, 0.0f, 1.0f};
 vector_t vec_angular_speed     = {0.0f, 0.0f, 0.0f};
 vector_t vec_norm_acc_angle    = {0.0f, 0.0f, 0.0f};
 
@@ -139,7 +148,17 @@ void data_processing_thread(void *argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void print_orientation(char *buffer, int value) {
+    int intPart = value / 100;
+    int fracPart = abs(value % 100); // Ensure fractional part is always positive
 
+    // Check if the overall value is negative but the integer part is 0 (e.g., -0.08)
+    if (value < 0 && intPart == 0) {
+        sprintf(buffer, "-0.%02d", fracPart);
+    } else {
+        sprintf(buffer, "%d.%02d", intPart, fracPart);
+    }
+}
 /* USER CODE END 0 */
 
 /**
@@ -171,7 +190,6 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_USART2_UART_Init();
-  
   /* USER CODE BEGIN 2 */
   char resetbuffer[64];
   HAL_UART_Transmit(&huart2, (uint8_t *)resetbuffer, strlen(resetbuffer), 50);
@@ -181,6 +199,9 @@ int main(void)
 
   /* Init scheduler */
   osKernelInitialize();
+  /* Create the mutex(es) */
+  /* creation of sharedResourcesMutex */
+  sharedResourcesMutexHandle = osMutexNew(&sharedResourcesMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -392,37 +413,54 @@ static void MX_GPIO_Init(void)
 void data_presentation_thread(void *argument)
 {
   /* USER CODE BEGIN 5 */
-  char buffer[176];
-  /* Infinite loop */
+    char buffer[512]; // Buffer for the entire message
+    char temp[64]; // Temporary buffer for individual values  /* Infinite loop */
   for (;;)
   {
-    if (1 != lsm6dso_imu_ok)
-    {
-      sprintf(buffer, "LSM6DSO init error!");
-      HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
-      osDelay(1000);
-    }
-    else
-    {
-      /* Print data to COM */
-      sprintf(buffer, 
-          "AccX: %d.%02d g, AccY: %d.%02d g, AccZ: %d.%02d g, "
-          "GyroX: %d.%02d [rad/s], GyroY: %d.%02d [rad/s], GyroZ: %d.%02d [rad/s], "
-          "Orientation_X: %d.%02d rad, Orientation_Y: %d.%02d rad, Orientation_Z: %d.%02d rad\r\n",
-          accX_int  / 100, accX_int % 100,
-          accY_int  / 100, accY_int % 100,
-          accZ_int  / 100, accZ_int % 100,
+  if (osMutexAcquire(sharedResourcesMutexHandle, osWaitForever) == osOK) 
+  {
+    if (1 != lsm6dso_imu_ok) {
+          sprintf(buffer, "LSM6DSO init error!");
+          HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
+          osMutexRelease(sharedResourcesMutexHandle);
+          osDelay(1000);
+      } else {
+          /* Prepare the formatted string for transmission */
+          strcpy(buffer, "AccX: ");
+          print_orientation(temp, accX_int);
+          strcat(buffer, temp);
+          strcat(buffer, " g, AccY: ");
+          print_orientation(temp, accY_int);
+          strcat(buffer, temp);
+          strcat(buffer, " g, AccZ: ");
+          print_orientation(temp, accZ_int);
+          strcat(buffer, temp);
+          strcat(buffer, " g, GyroX: ");
+          print_orientation(temp, gyroX_int);
+          strcat(buffer, temp);
+          strcat(buffer, " [rad/s], GyroY: ");
+          print_orientation(temp, gyroY_int);
+          strcat(buffer, temp);
+          strcat(buffer, " [rad/s], GyroZ: ");
+          print_orientation(temp, gyroZ_int);
+          strcat(buffer, temp);
+          strcat(buffer, " [rad/s], Orient_X: ");
+          print_orientation(temp, int_angleX);
+          strcat(buffer, temp);
+          strcat(buffer, " rad, Orient_Y: ");
+          print_orientation(temp, int_angleY);
+          strcat(buffer, temp);
+          strcat(buffer, " rad, Orient_Z: ");
+          print_orientation(temp, int_angleZ);
+          strcat(buffer, temp);
+          strcat(buffer, " rad\r\n");
 
-          gyroX_int / 100, gyroX_int % 100,
-          gyroY_int / 100, gyroY_int % 100,
-          gyroZ_int / 100, gyroZ_int % 100,
+          /* Transmit the formatted string */
+          HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
+          osMutexRelease(sharedResourcesMutexHandle);
+          osDelay(100);
+      }
 
-          int_angleX / 100, int_angleX % 100,
-          int_angleY / 100, int_angleY % 100,
-          int_angleZ / 100, int_angleZ % 100);
-
-      HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
-      osDelay(100);
     }
   }
   /* USER CODE END 5 */
@@ -441,12 +479,18 @@ void data_collection_thread(void *argument)
   /* Infinite loop */
 for (;;)
   {
+    if (osMutexAcquire(sharedResourcesMutexHandle, osWaitForever) == osOK) 
+    {
     stts751_read_temperature(&hi2c1, &temperature);
     lsm6dso_read_imu(&hi2c1, imu_vector);
+    
+    osMutexRelease(sharedResourcesMutexHandle);
     osDelay(10);
+    }
   }
   /* USER CODE END data_collection_thread */
 }
+
 /* USER CODE BEGIN Header_data_processing_thread */
 /**
 * @brief Function implementing the DataProcessing thread.
@@ -464,25 +508,34 @@ void data_processing_thread(void *argument)
   /* Infinite loop */
   for(;;)
   {
+  if (osMutexAcquire(sharedResourcesMutexHandle, osWaitForever) == osOK) 
+  {
     /* Get delta time */
     current_tick = HAL_GetTick(); 
     delta_time  = (current_tick - last_tick) / 1000.0f; // Convert milliseconds to seconds
     last_tick    = current_tick; 
     
     /* Filter gyro measurements */
-    iir_gyroX = IIR_filter(imu_vector[0], iir_gyroX, 0.5f);
-    iir_gyroY = IIR_filter(imu_vector[1], iir_gyroY, 0.5f);
-    iir_gyroZ = IIR_filter(imu_vector[2], iir_gyroZ, 0.5f);
+    iir_gyroX = IIR_filter(imu_vector[0], iir_gyroX, 1.0f);
+    iir_gyroY = IIR_filter(imu_vector[1], iir_gyroY, 1.0f);
+    iir_gyroZ = IIR_filter(imu_vector[2], iir_gyroZ, 1.0f);
 
     /* Accelerometer */
+    quat_acc_vector.w = 0.0f;
+    quat_acc_vector.x = imu_vector[3];
+    quat_acc_vector.y = imu_vector[4];
+    quat_acc_vector.z = imu_vector[5] + 1;
+
+    normalize_quaternion(&quat_acc_vector);
+
     accX_int  = (int)(imu_vector[3] * 100);
     accY_int  = (int)(imu_vector[4] * 100);
     accZ_int  = (int)((imu_vector[5] + 1) * 100);
 
     /*Konverterer gyro measuremens to rps */
-    angleX = dps_to_rps(iir_gyroX);
-    angleY = dps_to_rps(iir_gyroY);
-    angleZ = dps_to_rps(iir_gyroZ);
+    angleX = dps_to_rps(imu_vector[0]);
+    angleY = dps_to_rps(imu_vector[1]);
+    angleZ = dps_to_rps(imu_vector[2]);
 
     /* Gyro to print */
     gyroX_int = (int)(angleX * 100);
@@ -492,35 +545,39 @@ void data_processing_thread(void *argument)
     /* put anular speed in a vector
        and calculate orientation quaternion 
        based on gyro measurements     */
-    vec_angular_speed.x = iir_gyroX;
-    vec_angular_speed.y = iir_gyroY;
-    vec_angular_speed.z = iir_gyroZ;
+    vec_angular_speed.x = angleX;
+    vec_angular_speed.y = angleY;
+    vec_angular_speed.z = angleZ;
 
     quaternion_from_gyroscope(&quat_dq_gyro, &vec_angular_speed, delta_time); //beregnet rotasjon fra gyroskop dq_gyro
-    quat_gyro_orient = multiply_quaternions(quat_dq_gyro, quat_orientation); // gyro orientasjon er produktet av dq_gyro og global orientasjon.
 
-   
-        /* Calculate orientation quaternion based on 
-       accelerometer measurements */
+    quat_gyro_orient = multiply_quaternions(quat_dq_gyro, quat_orientation); // gyro orientasjon er produktet av dq_gyro og global orientasjon.    
 
-    vec_norm_acc_angle.x = imu_vector[3];
-    vec_norm_acc_angle.y = imu_vector[4];
-    vec_norm_acc_angle.z = imu_vector[5]; 
-    
-    // normalize_vector(&vec_norm_acc_angle);
+    // rotate_orientation_quaternion(&quat_acceleration, &quat_gyro_orient, &quat_acc_vector); // Hamilton produkt av gyro_orient og kvaternion av aks målinger.
 
-    // orientation_from_accelerometer(&vec_norm_acc_angle, &quat_acceleration);
+    // lagrer informasjonen fra forrige beregning i en vektor og normaliserer.
+    vec_norm_acc_angle.x = quat_acceleration.x;
+    vec_norm_acc_angle.y = quat_acceleration.y;
+    vec_norm_acc_angle.z = quat_acceleration.z;
 
+    normalize_vector(&vec_norm_acc_angle); 
+
+    // quaternion_from_acceleration(&quat_acc_rotation, &vec_norm_acc_angle);
+
+    // quaternion_t quat_accCorr = multiply_quaternions(quat_acc_rotation, quat_gyro_orient);
 
     vec_orientation = rotate_vector_by_quaternion(vec_orientation, quat_gyro_orient);
 
+    quat_orientation = quat_dq_gyro;
+
+    /* Present angles to COM */
     int_angleX = (int)(vec_orientation.x * 100);
     int_angleY = (int)(vec_orientation.y * 100);
     int_angleZ = (int)(vec_orientation.z * 100);
-
-
-
-    osDelay(100);
+    
+    osMutexRelease(sharedResourcesMutexHandle);
+    osDelay(10);
+  }
   }
   /* USER CODE END data_processing_thread */
 }
@@ -577,20 +634,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
-
-/* SCHEDULER TESTING 
-   PRINT TO COM
-
-  /* USER CODE BEGIN
-  char buffer[32];
-  uint16_t processing_counter = 0;
-  /* Infinite loop 
-  for(;;)
-  {
-    sprintf(buffer, "3. Processing: %d \n", processing_counter);
-    HAL_UART_Transmit(&huart2, (uint8_t *)buffer, strlen(buffer), 1000);
-    processing_counter++;
-    osDelay(1000);
-  }
-*/
